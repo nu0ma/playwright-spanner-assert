@@ -8,11 +8,10 @@ test.describe('example-01-basic-setup', () => {
   });
 });
 ```
-このような感じで、DBのデータを検証できるようなライブラリにしたい。
-npmライブラリです
-どこに接続情報を用意するかというと、playwright-spanner-assert.yamlにスキーマのファイルやDB名を記述するようにしたい。
+The goal is to provide a library that can validate database records from within a test file.
+This should be published as an npm package.
+Connection details should be stored in playwright-spanner-assert.yaml along with schema files and database names.
 
-そして構成はできるだけシンプルにしたい。
-なぜなら、モジュールを組み合わせて作ることで保守性も上がるからである。
-npmインストールをして、上記のコードのようにテストファイルないでDBのデータを検証できるようなライブラリにしたい。
-実際の検証についてはspalidateを使用しよう。
+Keep the structure as simple as possible so it stays maintainable by composing small modules.
+After installing the npm package, we want to validate database data in tests as shown above.
+The actual validation logic should rely on spalidate.

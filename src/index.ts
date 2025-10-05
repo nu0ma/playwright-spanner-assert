@@ -71,15 +71,18 @@ function createError(name: string, message: string): Error {
 }
 
 function createConfigurationNotFoundError(path: string): Error {
-  return createError('ConfigurationNotFoundError', `playwright-spanner-assert.yaml が見つかりません: ${path}`);
+  return createError('ConfigurationNotFoundError', `playwright-spanner-assert.yaml not found: ${path}`);
 }
 
 function createMissingFieldError(field: string): Error {
-  return createError('MissingFieldError', `playwright-spanner-assert.yaml の必須フィールドが不足しています: ${field}`);
+  return createError(
+    'MissingFieldError',
+    `Missing required field in playwright-spanner-assert.yaml: ${field}`
+  );
 }
 
 function createExpectedDataNotFoundError(pathValue: string): Error {
-  return createError('ExpectedDataNotFoundError', `期待データファイルが見つかりません: ${pathValue}`);
+  return createError('ExpectedDataNotFoundError', `Expected data file not found: ${pathValue}`);
 }
 
 function createParsingError(message: string): Error {
@@ -114,12 +117,12 @@ function createConfigLoader(options: PlaywrightSpannerAssertOptions = {}): Confi
       parsed = YAML.parse(raw) as PlaywrightSpannerAssertConfig;
     } catch (error) {
       throw createParsingError(
-        `playwright-spanner-assert.yaml の解析に失敗しました: ${(error as Error).message}`
+        `Failed to parse playwright-spanner-assert.yaml: ${(error as Error).message}`
       );
     }
 
     if (!parsed) {
-      throw createParsingError('playwright-spanner-assert.yaml が空、もしくは不正な形式です');
+      throw createParsingError('playwright-spanner-assert.yaml is empty or invalidly formatted');
     }
 
     assertField(parsed.schemaFile, 'schemaFile');
@@ -215,7 +218,7 @@ async function runSpalidate(options: {
     });
 
     child.on('error', (error) => {
-      reject(createSpalidateExecutionError(`spalidate の起動に失敗しました: ${error.message}`));
+      reject(createSpalidateExecutionError(`Failed to launch spalidate: ${error.message}`));
     });
 
     child.on('exit', (code) => {
@@ -224,7 +227,7 @@ async function runSpalidate(options: {
       } else {
         reject(
           createSpalidateExecutionError(
-            `spalidate が非ゼロ終了コード (${code ?? 'unknown'}) を返しました`
+            `spalidate exited with non-zero code (${code ?? 'unknown'})`
           )
         );
       }
@@ -291,7 +294,7 @@ async function resolveExpectedFile(
     return config.defaultExpectedData;
   }
 
-  throw createExpectedDataNotFoundError('デフォルトの期待データファイルが設定されていません');
+  throw createExpectedDataNotFoundError('Default expected data file is not configured');
 }
 
 function createPlaywrightSpannerAssert(

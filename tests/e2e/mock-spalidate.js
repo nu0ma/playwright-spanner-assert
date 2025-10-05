@@ -21,11 +21,11 @@ function recordInvocation(entry) {
 function ensureFileExists(flag, args) {
   const index = args.indexOf(flag);
   if (index === -1 || index === args.length - 1) {
-    throw new Error(`Flag ${flag} が見つからないか、値が不足しています`);
+    throw new Error(`Flag ${flag} is missing or has no value`);
   }
   const targetPath = args[index + 1];
   if (!fs.existsSync(targetPath)) {
-    throw new Error(`期待されたファイルが存在しません: ${targetPath}`);
+    throw new Error(`Expected file does not exist: ${targetPath}`);
   }
   return targetPath;
 }

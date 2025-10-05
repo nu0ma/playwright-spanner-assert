@@ -1,22 +1,22 @@
 # playwright-spanner-assert
 
-Playwright のテストから Cloud Spanner のデータ検証を呼び出すための軽量ユーティリティです。設定ファイル（`playwright-spanner-assert.yaml`）でスキーマやデータベース情報を定義し、期待データは YAML ファイルで管理します。検証処理自体は [spalidate](https://www.npmjs.com/package/spalidate) に委譲します。
+A lightweight utility for triggering Cloud Spanner data validation from Playwright tests. Define schema and database metadata in `playwright-spanner-assert.yaml`, manage expected datasets in YAML files, and delegate the heavy lifting to [spalidate](https://www.npmjs.com/package/spalidate).
 
-## インストール
+## Installation
 
 ```bash
 npm install playwright-spanner-assert spalidate
 ```
 
-TypeScript を利用する場合は以下も追加してください。
+If you use TypeScript, add the typings as dev dependencies:
 
 ```bash
 npm install -D typescript @types/node
 ```
 
-## 設定ファイル
+## Configuration
 
-プロジェクトルートに `playwright-spanner-assert.yaml` を配置します。雛型は `playwright-spanner-assert.yaml.example` を参照してください。
+Place `playwright-spanner-assert.yaml` in the project root. Use `playwright-spanner-assert.yaml.example` as a starting point.
 
 ```yaml
 schemaFile: ./schema/spanner-schema.yaml
@@ -42,9 +42,9 @@ spalidate:
     - "{expectedFile}"
 ```
 
-`spalidate.args` では `{schemaFile}` や `{expectedFile}` などのプレースホルダが利用できます。未指定の場合は上記の既定値が使われます。`defaultExpectedData` を設定すると `validateDatabaseState('')` のように空文字で呼び出した場合にも既定ファイルを利用できます。
+Placeholders such as `{schemaFile}` and `{expectedFile}` are expanded before invoking `spalidate`. If you omit `args`, the default sequence shown above is used. With `defaultExpectedData` set, `validateDatabaseState('')` falls back to the configured file when the argument is blank.
 
-## 使い方
+## Usage
 
 ```ts
 import playwrightSpannerAssert from 'playwright-spanner-assert';
@@ -53,12 +53,11 @@ import { test } from '@playwright/test';
 test.describe('example-01-basic-setup', () => {
   test('Database Validation', async () => {
     await playwrightSpannerAssert.validateDatabaseState('expected-data.yaml');
-    await playwrightSpannerAssert.validateDatabaseState(''); // defaultExpectedData を利用
   });
 });
 ```
 
-設定ファイルの場所を変更したい場合は環境変数 `PLAYWRIGHT_SPANNER_ASSERT_CONFIG` か `PlaywrightSpannerAssert` クラスを直接利用してください。
+To load a configuration file from a custom location, provide the factory with a `configPath` or set the `PLAYWRIGHT_SPANNER_ASSERT_CONFIG` environment variable.
 
 ```ts
 import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';
@@ -67,6 +66,6 @@ const client = createPlaywrightSpannerAssert({ configPath: './configs/playwright
 await client.validateDatabaseState('expected-data.yaml');
 ```
 
-## ライセンス
+## License
 
 MIT

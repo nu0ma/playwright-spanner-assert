@@ -1,7 +1,7 @@
 {
   "name": "playwright-spanner-assert",
   "version": "0.1.0",
-  "description": "PlaywrightでCloud Spannerの期待データを検証するヘルパー",
+  "description": "Helper for asserting Cloud Spanner data from Playwright tests",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
