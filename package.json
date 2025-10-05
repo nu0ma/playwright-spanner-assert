@@ -9,9 +9,10 @@
     "playwright-spanner-assert.yaml.example"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsdown",
     "test:e2e": "playwright test",
-    "pretest:e2e": "npm run build"
+    "pretest:e2e": "npm run build",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "playwright",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@playwright/test": "^1.46.0",
     "@types/node": "^20.0.0",
+    "tsdown": "^0.15.6",
     "typescript": "^5.5.0"
   }
 }
