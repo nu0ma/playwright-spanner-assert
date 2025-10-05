@@ -46,7 +46,7 @@ export async function runSpalidate({
     ...process.env,
     ...config.spalidate?.env,
   };
-  const spawnOverrides = sanitizeSpawnOptions(config.spalidate?.spawnOptions);
+  const spawnOverrides = config.spalidate?.spawnOptions ?? {};
 
   if (onDebug) {
     onDebug('spalidate:spawn', {
@@ -138,13 +138,4 @@ function replacePlaceholders(template: string, placeholders: PlaceholderMap): st
     const value = placeholders[key];
     return value !== undefined ? value : match;
   });
-}
-
-function sanitizeSpawnOptions(
-  options: SpalidateConfig['spawnOptions'],
-): SpalidateConfig['spawnOptions'] | undefined {
-  if (!options) {
-    return undefined;
-  }
-  return options;
 }

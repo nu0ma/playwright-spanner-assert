@@ -28,7 +28,8 @@
     "node": ">=18"
   },
   "dependencies": {
-    "yaml": "^2.5.0"
+    "yaml": "^2.5.0",
+    "zod": "^4.1.11"
   },
   "peerDependencies": {
     "spalidate": ">=1.0.0"

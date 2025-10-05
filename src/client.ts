@@ -1,7 +1,7 @@
+import { promises as fs } from 'fs';
 import path from 'path';
 import { createConfigLoader } from './config-loader';
 import { createExpectedDataNotFoundError } from './errors';
-import { ensureWithinBase } from './path-utils';
 import type {
   ConfigLoader,
   PlaywrightSpannerAssertClient,
@@ -12,7 +12,6 @@ import { runSpalidate } from './spalidate-runner';
 
 export type CreateClientOptions = PlaywrightSpannerAssertOptions & {
   configLoader?: ConfigLoader;
-  defaultExpectedDataFallback?: boolean;
   timeoutMs?: number;
   onDebug?: (message: string, payload?: Record<string, unknown>) => void;
 };
@@ -57,35 +56,30 @@ async function resolveExpectedFile(
   config: ResolvedPlaywrightSpannerAssertConfig,
 ): Promise<string> {
   const trimmed = rawPath?.trim() ?? '';
-  const candidates: string[] = [];
+  const searchRoots = trimmed ? [config.configDir, process.cwd()] : [config.configDir];
+  const fileName = trimmed || config.defaultExpectedData;
 
-  if (trimmed.length > 0) {
-    candidates.push(path.resolve(config.configDir, trimmed));
-    candidates.push(path.resolve(process.cwd(), trimmed));
-  } else if (config.defaultExpectedData) {
-    candidates.push(config.defaultExpectedData);
+  if (!fileName) {
+    throw createExpectedDataNotFoundError('default expected data is not set');
   }
 
-  for (const candidate of candidates) {
-    let guarded: string;
-    try {
-      guarded = ensureWithinBase(candidate, { baseDir: config.configDir });
-    } catch {
-      throw createExpectedDataNotFoundError(candidate);
-    }
-    try {
-      await fsAccess(guarded);
-      return guarded;
-    } catch {
+  for (const root of searchRoots) {
+    const absolute = path.resolve(root, fileName);
+    if (!isWithin(absolute, config.configDir)) {
       continue;
     }
+    try {
+      await fs.access(absolute);
+      return absolute;
+    } catch {
+      // try next candidate
+    }
   }
 
-  const messagePath = trimmed.length > 0 ? trimmed : (config.defaultExpectedData ?? 'unknown');
-  throw createExpectedDataNotFoundError(messagePath);
+  throw createExpectedDataNotFoundError(fileName);
 }
 
-async function fsAccess(targetPath: string): Promise<void> {
-  const { promises: fs } = await import('fs');
-  await fs.access(targetPath);
+function isWithin(target: string, baseDir: string): boolean {
+  const relative = path.relative(path.resolve(baseDir), target);
+  return !relative.startsWith('..');
 }
