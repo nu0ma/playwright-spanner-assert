@@ -69,3 +69,21 @@ await client.validateDatabaseState('expected-data.yaml');
 ## License
 
 MIT
+
+## Advanced options
+
+You can pass a timeout and debug hook when creating a client:
+
+```ts
+import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';
+
+const client = createPlaywrightSpannerAssert({
+  configPath: './configs/playwright-spanner-assert.yaml',
+  timeoutMs: 60_000,
+  onDebug: (event, payload) => {
+    console.debug('[span-assert]', event, payload);
+  },
+});
+
+await client.validateDatabaseState('expected-data.yaml');
+```
