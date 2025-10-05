@@ -29,12 +29,12 @@ spalidate:
   command: spalidate
   args:
     - --project
-    - "{projectId}"
+    - '{projectId}'
     - --instance
-    - "{instanceId}"
+    - '{instanceId}'
     - --database
-    - "{databaseName}"
-    - "{expectedFile}"
+    - '{databaseName}'
+    - '{expectedFile}'
 ```
 
 Placeholders such as `{schemaFile}` and `{expectedFile}` are expanded before invoking `spalidate`. If you omit `args`, the default sequence shown above is used. With `defaultExpectedData` set, `validateDatabaseState('')` falls back to the configured file when the argument is blank.
@@ -46,8 +46,8 @@ tables:
   Samples:
     count: 1
     columns:
-      Id: "1"
-      Name: "Default Name"
+      Id: '1'
+      Name: 'Default Name'
 ```
 
 ## Usage
@@ -68,24 +68,21 @@ To load a configuration file from a custom location, provide the factory with a 
 ```ts
 import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';
 
-const client = createPlaywrightSpannerAssert({ configPath: './configs/playwright-spanner-assert.yaml' });
+const client = createPlaywrightSpannerAssert({
+  configPath: './configs/playwright-spanner-assert.yaml',
+});
 await client.validateDatabaseState('expected-data.yaml');
 ```
 
-## License
-
-MIT
-
 ## Advanced options
 
-You can pass a timeout and debug hook when creating a client:
+`createPlaywrightSpannerAssert` に渡せる追加オプションは `onDebug` のみです。`spalidate` の実行は常に 60,000 ms でタイムアウトし、この値を変更するための設定は提供していません。
 
 ```ts
 import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';
 
 const client = createPlaywrightSpannerAssert({
   configPath: './configs/playwright-spanner-assert.yaml',
-  timeoutMs: 60_000,
   onDebug: (event, payload) => {
     console.debug('[span-assert]', event, payload);
   },
@@ -93,3 +90,7 @@ const client = createPlaywrightSpannerAssert({
 
 await client.validateDatabaseState('expected-data.yaml');
 ```
+
+## License
+
+MIT

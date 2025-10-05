@@ -12,12 +12,11 @@ import { runSpalidate } from './spalidate-runner';
 
 export type CreateClientOptions = PlaywrightSpannerAssertOptions & {
   configLoader?: ConfigLoader;
-  timeoutMs?: number;
   onDebug?: (message: string, payload?: Record<string, unknown>) => void;
 };
 
 export function createClient(options: CreateClientOptions = {}): PlaywrightSpannerAssertClient {
-  const { configLoader: providedLoader, timeoutMs, onDebug, ...loaderOptions } = options;
+  const { configLoader: providedLoader, onDebug, ...loaderOptions } = options;
   const configLoader = providedLoader ?? createConfigLoader(loaderOptions);
 
   const setConfigPath = (configPath: string): void => {
@@ -30,7 +29,6 @@ export function createClient(options: CreateClientOptions = {}): PlaywrightSpann
     await runSpalidate({
       config,
       expectedFile,
-      timeoutMs,
       onDebug,
     });
   };

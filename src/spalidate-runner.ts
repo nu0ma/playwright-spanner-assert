@@ -18,17 +18,17 @@ const DEFAULT_ARGS = [
   '{expectedFile}',
 ];
 
+const DEFAULT_TIMEOUT_MS = 60_000;
+
 export type RunSpalidateOptions = {
   config: ResolvedPlaywrightSpannerAssertConfig;
   expectedFile: string;
-  timeoutMs?: number;
   onDebug?: (message: string, payload?: Record<string, unknown>) => void;
 };
 
 export async function runSpalidate({
   config,
   expectedFile,
-  timeoutMs,
   onDebug,
 }: RunSpalidateOptions): Promise<void> {
   validateCommand(config.spalidate);
@@ -60,23 +60,19 @@ export async function runSpalidate({
       ...spawnOverrides,
     });
 
-    const timer = timeoutMs
-      ? setTimeout(() => {
-          child.kill('SIGKILL');
-          reject(
-            createSpalidateExecutionError('spalidate timed out', {
-              timeoutMs,
-              command,
-              args,
-            }),
-          );
-        }, timeoutMs)
-      : null;
+    const timer = setTimeout(() => {
+      child.kill('SIGKILL');
+      reject(
+        createSpalidateExecutionError('spalidate timed out', {
+          timeoutMs: DEFAULT_TIMEOUT_MS,
+          command,
+          args,
+        }),
+      );
+    }, DEFAULT_TIMEOUT_MS);
 
     child.on('error', (error) => {
-      if (timer) {
-        clearTimeout(timer);
-      }
+      clearTimeout(timer);
       reject(
         createSpalidateExecutionError(`Failed to launch spalidate: ${error.message}`, {
           command,
@@ -86,9 +82,7 @@ export async function runSpalidate({
     });
 
     child.on('exit', (code, signal) => {
-      if (timer) {
-        clearTimeout(timer);
-      }
+      clearTimeout(timer);
       if (code === 0) {
         resolve();
       } else {
