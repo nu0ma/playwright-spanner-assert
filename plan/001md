@@ -1,0 +1,18 @@
+
+```
+import playwrightSpannerAssert from 'playwright-spanner-assert';
+test.describe('example-01-basic-setup', () => {
+  test('Database Validation', async () => {
+    await playwrightSpannerAssert.validateDatabaseState('expected-data.yaml');
+    await playwrightSpannerAssert.validateDatabaseState('');
+  });
+});
+```
+このような感じで、DBのデータを検証できるようなライブラリにしたい。
+npmライブラリです
+どこに接続情報を用意するかというと、playwright-spanner-assert.yamlにスキーマのファイルやDB名を記述するようにしたい。
+
+そして構成はできるだけシンプルにしたい。
+なぜなら、モジュールを組み合わせて作ることで保守性も上がるからである。
+npmインストールをして、上記のコードのようにテストファイルないでDBのデータを検証できるようなライブラリにしたい。
+実際の検証についてはspalidateを使用しよう。

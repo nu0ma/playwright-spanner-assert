@@ -1,0 +1,18 @@
+[
+  {
+    "args": [
+      "--schema",
+      "/Users/ishikawaryoufutoshi/src/github.com/nu0ma/playwright-spanner-assert/tests/e2e/fixtures/schema/schema.sql",
+      "--project",
+      "e2e-project",
+      "--instance",
+      "e2e-instance",
+      "--database",
+      "e2e-database",
+      "--expected",
+      "/Users/ishikawaryoufutoshi/src/github.com/nu0ma/playwright-spanner-assert/tests/e2e/fixtures/expected/default.yaml"
+    ],
+    "expectedPath": "/Users/ishikawaryoufutoshi/src/github.com/nu0ma/playwright-spanner-assert/tests/e2e/fixtures/expected/default.yaml",
+    "timestamp": "2025-10-05T00:13:59.883Z"
+  }
+]

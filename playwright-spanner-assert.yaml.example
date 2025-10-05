@@ -1,0 +1,21 @@
+schemaFile: ./schema/spanner-schema.yaml
+defaultExpectedData: ./expected/initial-data.yaml
+database:
+  projectId: your-project-id
+  instanceId: your-instance-id
+  database: your-database-name
+spalidate:
+  command: npx
+  args:
+    - spalidate
+    - validate
+    - --schema
+    - "{schemaFile}"
+    - --project
+    - "{projectId}"
+    - --instance
+    - "{instanceId}"
+    - --database
+    - "{databaseName}"
+    - --expected
+    - "{expectedFile}"

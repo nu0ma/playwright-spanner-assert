@@ -1,0 +1,43 @@
+{
+  "name": "playwright-spanner-assert",
+  "version": "0.1.0",
+  "description": "PlaywrightでCloud Spannerの期待データを検証するヘルパー",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "playwright-spanner-assert.yaml.example"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test:e2e": "playwright test",
+    "pretest:e2e": "npm run build"
+  },
+  "keywords": [
+    "playwright",
+    "spanner",
+    "testing",
+    "validation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "yaml": "^2.5.0"
+  },
+  "peerDependencies": {
+    "spalidate": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "spalidate": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.46.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.5.0"
+  }
+}

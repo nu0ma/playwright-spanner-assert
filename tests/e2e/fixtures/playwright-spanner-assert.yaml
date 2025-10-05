@@ -1,0 +1,21 @@
+schemaFile: ./schema/schema.sql
+defaultExpectedData: ./expected/default.yaml
+database:
+  projectId: e2e-project
+  instanceId: e2e-instance
+  database: e2e-database
+spalidate:
+  command: node
+  args:
+    - ../mock-spalidate.js
+    - --schema
+    - "{schemaFile}"
+    - --project
+    - "{projectId}"
+    - --instance
+    - "{instanceId}"
+    - --database
+    - "{databaseName}"
+    - --expected
+    - "{expectedFile}"
+  workingDirectory: ./
