@@ -34,12 +34,11 @@ const configSchema = z.object({
 
 export type ConfigLoader = {
   setConfigPath: (configPath: string | undefined) => void;
-  load: (force?: boolean) => Promise<ResolvedPlaywrightSpannerAssertConfig>;
+  load: () => Promise<ResolvedPlaywrightSpannerAssertConfig>;
 };
 
 export function createConfigLoader(options: PlaywrightSpannerAssertOptions = {}): ConfigLoader {
   let currentOptions = { ...options };
-  let cached: { path: string; config: ResolvedPlaywrightSpannerAssertConfig } | null = null;
 
   const resolveConfigPath = async (): Promise<string> => {
     const candidate =
@@ -96,22 +95,15 @@ export function createConfigLoader(options: PlaywrightSpannerAssertOptions = {})
     } satisfies ResolvedPlaywrightSpannerAssertConfig;
   };
 
-  const load = async (force = false): Promise<ResolvedPlaywrightSpannerAssertConfig> => {
+  const load = async (): Promise<ResolvedPlaywrightSpannerAssertConfig> => {
     const configPath = await resolveConfigPath();
-    if (!force && cached?.path === configPath) {
-      return cached.config;
-    }
-
     const raw = await fs.readFile(configPath, 'utf8');
-    const parsed = await parseConfig(raw, configPath);
-    cached = { path: configPath, config: parsed };
-    return parsed;
+    return parseConfig(raw, configPath);
   };
 
   const setConfigPath = (configPath: string | undefined): void => {
     if (configPath) {
       currentOptions = { ...currentOptions, configPath };
-      cached = null;
     }
   };
 

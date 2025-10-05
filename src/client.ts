@@ -31,19 +31,9 @@ export function createClient(options: CreateClientOptions = {}): PlaywrightSpann
     });
   };
 
-  const reloadConfig = async (): Promise<ResolvedPlaywrightSpannerAssertConfig> => {
-    return configLoader.load(true);
-  };
-
-  const getConfig = async (): Promise<ResolvedPlaywrightSpannerAssertConfig> => {
-    return configLoader.load();
-  };
-
   return {
     setConfigPath,
     validateDatabaseState,
-    reloadConfig,
-    getConfig,
   };
 }
 

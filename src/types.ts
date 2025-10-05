@@ -36,6 +36,4 @@ export type PlaceholderMap = Record<string, string>;
 export type PlaywrightSpannerAssertClient = {
   setConfigPath: (configPath: string) => void;
   validateDatabaseState: (expectedDataPath?: string) => Promise<void>;
-  reloadConfig: () => Promise<ResolvedPlaywrightSpannerAssertConfig>;
-  getConfig: () => Promise<ResolvedPlaywrightSpannerAssertConfig>;
 };
