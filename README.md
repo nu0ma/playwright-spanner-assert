@@ -4,13 +4,15 @@ A simple utility for validating Cloud Spanner data from Playwright tests.
 
 ## Example
 
-### Basic example
 
 ```ts
 import { test } from '@playwright/test';
 import playwrightSpannerAssert from 'playwright-spanner-assert';
 
 test('database validation', async () => {
+  // Your test code...
+
+  // Validate Spanner state with expected data
   await playwrightSpannerAssert.validateDatabaseState('expected/data.yaml');
 });
 ```
