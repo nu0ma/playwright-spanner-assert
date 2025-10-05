@@ -39,8 +39,3 @@ export type PlaywrightSpannerAssertClient = {
   reloadConfig: () => Promise<ResolvedPlaywrightSpannerAssertConfig>;
   getConfig: () => Promise<ResolvedPlaywrightSpannerAssertConfig>;
 };
-
-export type ConfigLoader = {
-  setConfigPath: (configPath: string | undefined) => void;
-  load: (force?: boolean) => Promise<ResolvedPlaywrightSpannerAssertConfig>;
-};

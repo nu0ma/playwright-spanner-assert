@@ -3,7 +3,6 @@ import path from 'path';
 import { createConfigLoader } from './config-loader';
 import { createExpectedDataNotFoundError } from './errors';
 import type {
-  ConfigLoader,
   PlaywrightSpannerAssertClient,
   PlaywrightSpannerAssertOptions,
   ResolvedPlaywrightSpannerAssertConfig,
@@ -11,13 +10,12 @@ import type {
 import { runSpalidate } from './spalidate-runner';
 
 export type CreateClientOptions = PlaywrightSpannerAssertOptions & {
-  configLoader?: ConfigLoader;
   onDebug?: (message: string, payload?: Record<string, unknown>) => void;
 };
 
 export function createClient(options: CreateClientOptions = {}): PlaywrightSpannerAssertClient {
-  const { configLoader: providedLoader, onDebug, ...loaderOptions } = options;
-  const configLoader = providedLoader ?? createConfigLoader(loaderOptions);
+  const { onDebug, configPath } = options;
+  const configLoader = createConfigLoader({ configPath });
 
   const setConfigPath = (configPath: string): void => {
     configLoader.setConfigPath(configPath);

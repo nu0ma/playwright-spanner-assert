@@ -1,6 +1,6 @@
 import { createPlaywrightSpannerAssert } from './public-api';
 
-const defaultClient = createPlaywrightSpannerAssert();
+const client = createPlaywrightSpannerAssert();
 
-export default defaultClient;
+export default client;
 export * from './public-api';
