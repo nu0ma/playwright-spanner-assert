@@ -2,6 +2,38 @@
 
 A simple utility for validating Cloud Spanner data from Playwright tests.
 
+## Exampl
+
+### Basic example
+
+```ts
+import { test } from '@playwright/test';
+import playwrightSpannerAssert from 'playwright-spanner-assert';
+
+test('database validation', async () => {
+  await playwrightSpannerAssert.validateDatabaseState('expected/data.yaml');
+});
+```
+
+### Expected data file format example
+
+Follow the [spalidate](https://github.com/nu0ma/spalidate) format:
+
+```yaml
+tables:
+  Users:
+    count: 1
+    columns:
+      Id: '1'
+      Name: 'Alice'
+      Email: 'alice@example.com'
+
+  Posts:
+    count: 3
+    columns:
+      UserId: '1'
+```
+
 ## Quick Start
 
 ### 1. Install
