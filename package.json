@@ -9,6 +9,7 @@
     "playwright-spanner-assert.yaml.example"
   ],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "tsdown",
     "test:e2e": "playwright test",
     "pretest:e2e": "npm run build",
