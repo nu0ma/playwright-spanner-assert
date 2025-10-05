@@ -1,11 +1,7 @@
 import { spawn } from 'child_process';
 import path from 'path';
 import { SpalidateExecutionError } from './errors';
-import type {
-  PlaceholderMap,
-  ResolvedPlaywrightSpannerAssertConfig,
-  SpalidateConfig,
-} from './types';
+import type { PlaceholderMap, ResolvedPlaywrightSpannerAssertConfig } from './types';
 
 const DEFAULT_COMMAND = 'spalidate';
 const DEFAULT_ARGS = [
@@ -17,7 +13,6 @@ const DEFAULT_ARGS = [
   '{databaseName}',
   '{expectedFile}',
 ];
-
 const DEFAULT_TIMEOUT_MS = 60_000;
 
 export type RunSpalidateOptions = {
@@ -31,25 +26,32 @@ export async function runSpalidate({
   expectedFile,
   onDebug,
 }: RunSpalidateOptions): Promise<void> {
-  validateCommand(config.spalidate);
+  if (config.spalidate?.command?.trim() === '') {
+    throw new SpalidateExecutionError('spalidate command cannot be empty');
+  }
+
   const command = config.spalidate?.command ?? DEFAULT_COMMAND;
   const argsTemplate = config.spalidate?.args ?? DEFAULT_ARGS;
   const cwd = config.spalidate?.workingDirectory ?? config.configDir;
-  const placeholderValues = buildPlaceholderMap(config, expectedFile);
-  const args = argsTemplate.map((value) => replacePlaceholders(value, placeholderValues));
-  const env = {
-    ...process.env,
-    ...config.spalidate?.env,
-  };
-  const spawnOverrides = config.spalidate?.spawnOptions ?? {};
+  const timeout = config.spalidate?.timeout ?? DEFAULT_TIMEOUT_MS;
 
-  if (onDebug) {
-    onDebug('spalidate:spawn', {
-      command,
-      args,
-      cwd,
-    });
-  }
+  const placeholders: PlaceholderMap = {
+    schemaFile: config.schemaFile ?? '',
+    expectedFile,
+    projectId: config.database.projectId,
+    instanceId: config.database.instanceId,
+    databaseName: config.database.database,
+    configDir: config.configDir,
+    expectedDir: path.dirname(expectedFile),
+  };
+
+  const args = argsTemplate.map((arg) =>
+    arg.replace(/\{(\w+)\}/g, (_, key: string) => placeholders[key] ?? `{${key}}`),
+  );
+
+  const env = { ...process.env, ...config.spalidate?.env };
+
+  onDebug?.('spalidate:spawn', { command, args, cwd });
 
   await new Promise<void>((resolve, reject) => {
     const child = spawn(command, args, {
@@ -57,13 +59,13 @@ export async function runSpalidate({
       env,
       stdio: 'inherit',
       shell: process.platform === 'win32',
-      ...spawnOverrides,
+      ...config.spalidate?.spawnOptions,
     });
 
     const timer = setTimeout(() => {
       child.kill('SIGKILL');
-      reject(new SpalidateExecutionError(`spalidate timed out after ${DEFAULT_TIMEOUT_MS}ms`));
-    }, DEFAULT_TIMEOUT_MS);
+      reject(new SpalidateExecutionError(`spalidate timed out after ${timeout}ms`));
+    }, timeout);
 
     child.on('error', (error) => {
       clearTimeout(timer);
@@ -83,33 +85,5 @@ export async function runSpalidate({
         );
       }
     });
-  });
-}
-
-function validateCommand(spalidate: SpalidateConfig | undefined): void {
-  if (spalidate?.command && spalidate.command.trim() === '') {
-    throw new SpalidateExecutionError('spalidate command cannot be empty');
-  }
-}
-
-function buildPlaceholderMap(
-  config: ResolvedPlaywrightSpannerAssertConfig,
-  expectedFile: string,
-): PlaceholderMap {
-  return {
-    schemaFile: config.schemaFile ?? '',
-    expectedFile,
-    projectId: config.database.projectId,
-    instanceId: config.database.instanceId,
-    databaseName: config.database.database,
-    configDir: config.configDir,
-    expectedDir: path.dirname(expectedFile),
-  };
-}
-
-function replacePlaceholders(template: string, placeholders: PlaceholderMap): string {
-  return template.replace(/\{(\w+)\}/g, (match, key: string) => {
-    const value = placeholders[key];
-    return value !== undefined ? value : match;
   });
 }

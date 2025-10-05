@@ -13,6 +13,7 @@ export const spalidateSchema = z
     env: z.record(z.string(), z.string()).optional(),
     spawnOptions: z.any().optional(),
     workingDirectory: z.string().optional(),
+    timeout: z.number().positive().optional(),
   })
   .optional();
 

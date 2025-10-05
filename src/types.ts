@@ -12,6 +12,7 @@ export type SpalidateConfig = {
   env?: Record<string, string>;
   spawnOptions?: Omit<SpawnOptionsWithoutStdio, 'env' | 'cwd'>;
   workingDirectory?: string;
+  timeout?: number;
 };
 
 export type PlaywrightSpannerAssertConfig = {
