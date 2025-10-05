@@ -2,7 +2,7 @@
 
 A simple utility for validating Cloud Spanner data from Playwright tests.
 
-## Exampl
+## Example
 
 ### Basic example
 
