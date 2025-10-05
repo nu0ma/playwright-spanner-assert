@@ -2,6 +2,10 @@
 
 A simple utility for validating Cloud Spanner data from Playwright tests.
 
+[![npm version](https://img.shields.io/npm/v/playwright-spanner-assert)](https://www.npmjs.com/package/playwright-spanner-assert)
+[![CI](https://github.com/nu0ma/playwright-spanner-assert/actions/workflows/ci.yml/badge.svg)](https://github.com/nu0ma/playwright-spanner-assert/actions/workflows/ci.yml)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nu0ma/playwright-spanner-assert)
+
 ## Example
 
 ```ts
