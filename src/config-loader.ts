@@ -1,7 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import YAML from 'yaml';
-import { z } from 'zod';
 import {
   createConfigurationNotFoundError,
   createMissingFieldError,
@@ -14,29 +13,7 @@ import type {
   ResolvedPlaywrightSpannerAssertConfig,
   SpalidateConfig,
 } from './types';
-
-const databaseSchema = z.object({
-  projectId: z.string().min(1),
-  instanceId: z.string().min(1),
-  database: z.string().min(1),
-});
-
-const spalidateSchema = z
-  .object({
-    command: z.string().min(1).optional(),
-    args: z.array(z.string()).optional(),
-    env: z.record(z.string()).optional(),
-    spawnOptions: z.any().optional(),
-    workingDirectory: z.string().optional(),
-  })
-  .optional();
-
-const configSchema = z.object({
-  schemaFile: z.string().min(1),
-  defaultExpectedData: z.string().min(1).optional(),
-  database: databaseSchema,
-  spalidate: spalidateSchema,
-});
+import { validateConfigSchema } from './validatebot';
 
 export type ConfigLoader = {
   setConfigPath: (configPath: string | undefined) => void;
@@ -78,19 +55,15 @@ export function createConfigLoader(
       );
     }
 
-    const parsed = configSchema.safeParse(parsedYaml);
+    const parsed = validateConfigSchema(parsedYaml);
     if (!parsed.success) {
-      const issues = parsed.error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: issue.message,
-      }));
       throw createParsingError('playwright-spanner-assert.yaml validation failed', {
         configPath,
-        issues,
+        issues: parsed.issues,
       });
     }
 
-    const config = parsed.data as PlaywrightSpannerAssertConfig;
+    const config = parsed.data;
     assertField(config.schemaFile, 'schemaFile');
     assertField(config.database, 'database');
     assertField(config.database.projectId, 'database.projectId');
