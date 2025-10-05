@@ -9,7 +9,7 @@ A simple utility for validating Cloud Spanner data from Playwright tests.
 import { test } from '@playwright/test';
 import playwrightSpannerAssert from 'playwright-spanner-assert';
 
-test('database validation', async () => {
+test('user is created correctly', async () => {
   // Your test code...
 
   // Validate Spanner state with expected data
