@@ -1,36 +1,14 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import YAML from 'yaml';
-import { z } from 'zod';
-import { ConfigurationNotFoundError, ParsingError } from './errors';
+import { ConfigurationNotFoundError, ExpectedDataNotFoundError, ParsingError } from './errors';
 import type {
   DatabaseConfig,
   PlaywrightSpannerAssertOptions,
   ResolvedPlaywrightSpannerAssertConfig,
   SpalidateConfig,
 } from './types';
-const databaseSchema = z.object({
-  projectId: z.string().min(1),
-  instanceId: z.string().min(1),
-  database: z.string().min(1),
-});
-
-const spalidateSchema = z
-  .object({
-    command: z.string().min(1).optional(),
-    args: z.array(z.string()).optional(),
-    env: z.record(z.string(), z.string()).optional(),
-    spawnOptions: z.any().optional(),
-    workingDirectory: z.string().optional(),
-  })
-  .optional();
-
-const configSchema = z.object({
-  schemaFile: z.string().min(1),
-  expectedData: z.string().min(1).optional(),
-  database: databaseSchema,
-  spalidate: spalidateSchema,
-});
+import { configSchema } from './config-schema';
 
 export async function loadConfig(
   options: PlaywrightSpannerAssertOptions = {},
@@ -118,4 +96,37 @@ function resolveSpalidate(
     resolved.workingDirectory = path.resolve(configDir, cfg.workingDirectory);
   }
   return resolved;
+}
+
+export async function resolveExpectedFile(
+  rawPath: string | undefined,
+  config: ResolvedPlaywrightSpannerAssertConfig,
+): Promise<string> {
+  const trimmed = rawPath?.trim() ?? '';
+  const searchRoots = trimmed ? [config.configDir, process.cwd()] : [config.configDir];
+  const fileName = trimmed || config.expectedData;
+
+  if (!fileName) {
+    throw new ExpectedDataNotFoundError('default expected data is not set');
+  }
+
+  for (const root of searchRoots) {
+    const absolute = path.resolve(root, fileName);
+    if (!isWithin(absolute, config.configDir)) {
+      continue;
+    }
+    try {
+      await fs.access(absolute);
+      return absolute;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  throw new ExpectedDataNotFoundError(fileName);
+}
+
+function isWithin(target: string, baseDir: string): boolean {
+  const relative = path.relative(path.resolve(baseDir), target);
+  return !relative.startsWith('..');
 }
