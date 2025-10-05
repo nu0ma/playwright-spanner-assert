@@ -64,21 +64,19 @@ tasks:
         docker rm -f {{.EMULATOR_CONTAINER}} >/dev/null 2>&1 || true
 
   emulator:setup:
-    desc: Create instance and database schema on emulator
+    desc: Create instance and database schema on emulator using wrench
     cmds:
       - |
-        gcloud spanner instances delete {{.INSTANCE}} --project={{.PROJECT}} --quiet >/dev/null 2>&1 || true
+        SPANNER_PROJECT_ID={{.PROJECT}} \
+        SPANNER_INSTANCE_ID={{.INSTANCE}} \
+        SPANNER_EMULATOR_HOST={{.EMULATOR_HOST}} \
+        wrench instance create || true
       - |
-        gcloud spanner instances create {{.INSTANCE}} \
-          --config=emulator-config \
-          --description="Playwright Spanner emulator" \
-          --nodes=1 \
-          --project={{.PROJECT}}
-      - |
-        gcloud spanner databases create {{.DATABASE}} \
-          --instance={{.INSTANCE}} \
-          --project={{.PROJECT}} \
-          --ddl-file={{.SCHEMA}}
+        sh -c 'tmp=$(mktemp -d); cp {{.SCHEMA}} $tmp/schema.sql; \
+        SPANNER_PROJECT_ID={{.PROJECT}} \
+        SPANNER_INSTANCE_ID={{.INSTANCE}} \
+        SPANNER_EMULATOR_HOST={{.EMULATOR_HOST}} \
+        wrench create --database={{.DATABASE}} --directory=$tmp --schema_file=schema.sql || true'
 
   test:emulator:
     desc: Run Playwright e2e tests against the Spanner emulator via spalidate
