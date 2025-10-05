@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { execSync } from 'child_process';
+import { Spanner } from '@google-cloud/spanner';
 import path from 'path';
 
 const REQUIRED_ENV_VARS = [
@@ -22,7 +22,7 @@ const configPath = path.join(fixturesDir, 'playwright-spanner-assert.yaml');
 
 const project = process.env.SPANNER_PROJECT!;
 const instance = process.env.SPANNER_INSTANCE!;
-const database = process.env.SPANNER_DATABASE!;
+const databaseName = process.env.SPANNER_DATABASE!;
 const emulatorHost = process.env.SPANNER_EMULATOR_HOST ?? '127.0.0.1:9010';
 const adminPort = process.env.SPANNER_EMULATOR_ADMIN_PORT ?? '9020';
 
@@ -31,24 +31,17 @@ process.env.SPANNER_EMULATOR_HOST = emulatorHost;
 process.env.CLOUDSDK_API_ENDPOINT_OVERRIDES_SPANNER =
   process.env.CLOUDSDK_API_ENDPOINT_OVERRIDES_SPANNER ?? `http://127.0.0.1:${adminPort}/`;
 
-function runSql(sql: string): void {
-  const command = [
-    'gcloud',
-    'spanner',
-    'databases',
-    'execute-sql',
-    database,
-    `--instance=${instance}`,
-    `--project=${project}`,
-    `--sql="${sql}"`,
-    '--quiet',
-  ].join(' ');
-  execSync(command, { env: process.env, stdio: 'inherit' });
+const spanner = new Spanner({ projectId: project });
+const spannerInstance = spanner.instance(instance);
+const database = spannerInstance.database(databaseName);
+
+async function runSql(sql: string): Promise<void> {
+  await database.run(sql);
 }
 
-function resetSamples(id: string, name: string): void {
-  runSql('DELETE FROM Samples WHERE TRUE');
-  runSql(`INSERT INTO Samples (Id, Name) VALUES ('${id}', '${name}')`);
+async function resetSamples(id: string, name: string): Promise<void> {
+  await runSql('DELETE FROM Samples WHERE TRUE');
+  await runSql(`INSERT INTO Samples (Id, Name) VALUES ('${id}', '${name}')`);
 }
 
 test.beforeEach(async () => {
@@ -66,13 +59,13 @@ function loadClient() {
 }
 
 test('validates default dataset against emulator', async () => {
-  resetSamples('1', 'Default Name');
+  await resetSamples('1', 'Default Name');
   const client = loadClient();
   await client.validateDatabaseState('');
 });
 
 test('validates custom dataset against emulator', async () => {
-  resetSamples('2', 'Custom Name');
+  await resetSamples('2', 'Custom Name');
   const client = loadClient();
   await client.validateDatabaseState('expected/custom.yaml');
 });

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -25,6 +25,11 @@ jobs:
 
       - name: Install Task
         uses: go-task/setup-task@0ab1b2a65bc55236a3bc64cde78f80e20e8885c2 # v1.0.0
+
+      - name: Install wrench
+        run: |
+          go install github.com/cloudspannerecosystem/wrench@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
 
       - name: Lint
         run: npm run lint
