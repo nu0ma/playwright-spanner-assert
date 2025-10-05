@@ -16,15 +16,30 @@ npm install -D typescript @types/node
 
 ## Configuration
 
-Place `playwright-spanner-assert.yaml` in the project root. Use `playwright-spanner-assert.yaml.example` as a starting point.
+Place `playwright-spanner-assert.yaml` in the project root. The minimal configuration only requires the database connection info:
 
 ```yaml
-schemaFile: ./schema/spanner-schema.yaml
-expectedData: ./expected/initial-data.yaml
 database:
   projectId: my-project
   instanceId: staging
   database: sample
+```
+
+Optional settings:
+
+```yaml
+database:
+  projectId: my-project
+  instanceId: staging
+  database: sample
+
+# デフォルトの期待データファイル（省略時は毎回引数で指定）
+expectedData: ./expected/initial-data.yaml
+
+# カスタムコマンド引数用のプレースホルダー
+schemaFile: ./schema/spanner-schema.yaml
+
+# spalidate コマンドのカスタマイズ
 spalidate:
   command: spalidate
   args:
@@ -37,7 +52,7 @@ spalidate:
     - '{expectedFile}'
 ```
 
-Placeholders such as `{schemaFile}` and `{expectedFile}` are expanded before invoking `spalidate`. If you omit `args`, the default sequence shown above is used. With `expectedData` set, `validateDatabaseState('')` falls back to the configured file when the argument is blank.
+Placeholders such as `{schemaFile}` and `{expectedFile}` are expanded before invoking `spalidate`. If you omit `args`, the default arguments shown above are used. With `expectedData` set, `validateDatabaseState('')` falls back to the configured file when the argument is blank.
 
 Expected data files should follow the configuration format that the Go 製 `spalidate` CLI consumes, for example:
 

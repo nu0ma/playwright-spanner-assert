@@ -76,7 +76,7 @@ async function parseConfig(
 
   return {
     ...config,
-    schemaFile: resolvePath(config.schemaFile)!,
+    schemaFile: resolvePath(config.schemaFile),
     expectedData: resolvePath(config.expectedData),
     database: { ...config.database } satisfies DatabaseConfig,
     spalidate: resolveSpalidate(config.spalidate, configDir),

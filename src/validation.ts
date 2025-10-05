@@ -97,7 +97,7 @@ function buildPlaceholderMap(
   expectedFile: string,
 ): PlaceholderMap {
   return {
-    schemaFile: config.schemaFile,
+    schemaFile: config.schemaFile ?? '',
     expectedFile,
     projectId: config.database.projectId,
     instanceId: config.database.instanceId,

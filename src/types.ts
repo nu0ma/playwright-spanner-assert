@@ -15,14 +15,14 @@ export type SpalidateConfig = {
 };
 
 export type PlaywrightSpannerAssertConfig = {
-  schemaFile: string;
-  expectedData?: string;
   database: DatabaseConfig;
+  expectedData?: string;
+  schemaFile?: string;
   spalidate?: SpalidateConfig;
 };
 
 export type ResolvedPlaywrightSpannerAssertConfig = PlaywrightSpannerAssertConfig & {
-  schemaFile: string;
+  schemaFile?: string;
   expectedData?: string;
   configDir: string;
 };

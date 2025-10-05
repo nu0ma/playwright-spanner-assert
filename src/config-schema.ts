@@ -17,8 +17,8 @@ export const spalidateSchema = z
   .optional();
 
 export const configSchema = z.object({
-  schemaFile: z.string().min(1),
-  expectedData: z.string().min(1).optional(),
   database: databaseSchema,
+  expectedData: z.string().min(1).optional(),
+  schemaFile: z.string().min(1).optional(),
   spalidate: spalidateSchema,
 });
