@@ -1,5 +1,0 @@
-expectedData: ./expected/default.yaml
-database:
-  projectId: e2e-project
-  instanceId: e2e-instance
-  database: e2e-database

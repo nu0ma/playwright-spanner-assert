@@ -3,15 +3,3 @@ database:
   projectId: e2e-project
   instanceId: e2e-instance
   database: e2e-database
-spalidate:
-  command: node
-  args:
-    - ../mock-spalidate.js
-    - --project
-    - '{projectId}'
-    - --instance
-    - '{instanceId}'
-    - --database
-    - '{databaseName}'
-    - '{expectedFile}'
-  workingDirectory: ./

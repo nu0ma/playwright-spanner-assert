@@ -1,51 +1,78 @@
-import { test, expect } from '@playwright/test';
-import { promises as fs } from 'fs';
+import { test } from '@playwright/test';
+import { execSync } from 'child_process';
 import path from 'path';
 
-const fixturesDir = path.resolve(__dirname, 'fixtures');
-const logPath = path.resolve(__dirname, '.tmp/invocations.json');
+const REQUIRED_ENV_VARS = [
+  'SPANNER_EMULATOR_HOST',
+  'SPANNER_PROJECT',
+  'SPANNER_INSTANCE',
+  'SPANNER_DATABASE',
+];
+const missingEnv = REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
 
-async function readInvocations() {
-  const raw = await fs.readFile(logPath, 'utf8');
-  return JSON.parse(raw) as Array<{ args: string[] }>;
+test.skip(
+  missingEnv.length > 0,
+  `Spanner emulator tests require env vars: ${missingEnv.join(', ')}`,
+);
+
+test.describe.configure({ mode: 'serial' });
+
+const fixturesDir = path.resolve(__dirname, 'fixtures');
+const configPath = path.join(fixturesDir, 'playwright-spanner-assert.yaml');
+
+const project = process.env.SPANNER_PROJECT!;
+const instance = process.env.SPANNER_INSTANCE!;
+const database = process.env.SPANNER_DATABASE!;
+const emulatorHost = process.env.SPANNER_EMULATOR_HOST ?? '127.0.0.1:9010';
+const adminPort = process.env.SPANNER_EMULATOR_ADMIN_PORT ?? '9020';
+
+process.env.GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT ?? project;
+process.env.SPANNER_EMULATOR_HOST = emulatorHost;
+process.env.CLOUDSDK_API_ENDPOINT_OVERRIDES_SPANNER =
+  process.env.CLOUDSDK_API_ENDPOINT_OVERRIDES_SPANNER ?? `http://127.0.0.1:${adminPort}/`;
+
+function runSql(sql: string): void {
+  const command = [
+    'gcloud',
+    'spanner',
+    'databases',
+    'execute-sql',
+    database,
+    `--instance=${instance}`,
+    `--project=${project}`,
+    `--sql="${sql}"`,
+    '--quiet',
+  ].join(' ');
+  execSync(command, { env: process.env, stdio: 'inherit' });
+}
+
+function resetSamples(id: string, name: string): void {
+  runSql('DELETE FROM Samples WHERE TRUE');
+  runSql(`INSERT INTO Samples (Id, Name) VALUES ('${id}', '${name}')`);
 }
 
 test.beforeEach(async () => {
-  await fs.rm(logPath, { force: true });
+  delete require.cache[require.resolve('../../dist')];
 });
 
 test.afterEach(() => {
   delete require.cache[require.resolve('../../dist')];
 });
 
-test('default export validates custom and default expectations', async () => {
+function loadClient() {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { createPlaywrightSpannerAssert } = require('../../dist');
-  const client = createPlaywrightSpannerAssert({
-    configPath: path.join(fixturesDir, 'playwright-spanner-assert.yaml'),
-  });
+  return createPlaywrightSpannerAssert({ configPath });
+}
 
-  await client.validateDatabaseState('expected/custom.yaml');
+test('validates default dataset against emulator', async () => {
+  resetSamples('1', 'Default Name');
+  const client = loadClient();
   await client.validateDatabaseState('');
-
-  const invocations = await readInvocations();
-  expect(invocations.length).toBe(2);
-  const firstArgs = invocations[0].args;
-  const secondArgs = invocations[1].args;
-
-  expect(firstArgs).toContain(path.resolve(fixturesDir, 'expected/custom.yaml'));
-  expect(secondArgs).toContain(path.resolve(fixturesDir, 'expected/default.yaml'));
 });
 
-test('factory produces isolated client with explicit config path', async () => {
-  const { createPlaywrightSpannerAssert } = require('../../dist');
-  const client = createPlaywrightSpannerAssert({
-    configPath: path.join(fixturesDir, 'playwright-spanner-assert.yaml'),
-  });
-
-  await client.validateDatabaseState('');
-
-  const invocations = await readInvocations();
-  expect(invocations.length).toBe(1);
-  const args = invocations[0].args;
-  expect(args).toContain(path.resolve(fixturesDir, 'expected/default.yaml'));
+test('validates custom dataset against emulator', async () => {
+  resetSamples('2', 'Custom Name');
+  const client = loadClient();
+  await client.validateDatabaseState('expected/custom.yaml');
 });
