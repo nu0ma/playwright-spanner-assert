@@ -1,0 +1,23 @@
+# 最小限の設定
+database:
+  projectId: your-project-id
+  instanceId: your-instance-id
+  database: your-database-name
+
+# オプション: デフォルトの期待データファイル
+# expectedData: ./expected/initial-data.yaml
+
+# オプション: カスタムコマンド引数で使用できる
+# schemaFile: ./schema/spanner-schema.yaml
+
+# オプション: spalidate コマンドのカスタマイズ
+# spalidate:
+#   command: spalidate
+#   args:
+#     - --project
+#     - "{projectId}"
+#     - --instance
+#     - "{instanceId}"
+#     - --database
+#     - "{databaseName}"
+#     - "{expectedFile}"
