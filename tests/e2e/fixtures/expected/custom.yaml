@@ -2,5 +2,5 @@ tables:
   Samples:
     count: 1
     columns:
-      Id: "2"
-      Name: "Custom Name"
+      Id: '2'
+      Name: 'Custom Name'

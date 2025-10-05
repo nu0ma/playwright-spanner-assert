@@ -4,7 +4,6 @@ A simple utility for validating Cloud Spanner data from Playwright tests.
 
 ## Example
 
-
 ```ts
 import { test } from '@playwright/test';
 import playwrightSpannerAssert from 'playwright-spanner-assert';
