@@ -121,50 +121,6 @@ database:
 
 That's all you need.
 
-## Usage
-
-### Basic usage
-
-```ts
-import { test } from '@playwright/test';
-import playwrightSpannerAssert from 'playwright-spanner-assert';
-
-test('database validation', async () => {
-  await playwrightSpannerAssert.validateDatabaseState('expected/data.yaml');
-});
-```
-
-### Using a custom config file
-
-```ts
-import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';
-
-const client = createPlaywrightSpannerAssert({
-  configPath: './config/spanner-test.yaml',
-});
-
-await client.validateDatabaseState('expected/data.yaml');
-```
-
-### Expected data file format
-
-Follow the [spalidate](https://github.com/nu0ma/spalidate) format:
-
-```yaml
-tables:
-  Users:
-    count: 1
-    columns:
-      Id: '1'
-      Name: 'Alice'
-      Email: 'alice@example.com'
-
-  Posts:
-    count: 3
-    columns:
-      UserId: '1'
-```
-
 ## License
 
 MIT
