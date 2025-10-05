@@ -88,4 +88,4 @@ tasks:
         task emulator:up
         trap 'task emulator:down >/dev/null 2>&1 || true' EXIT
         task emulator:setup
-        pnpm run test:e2e -- --reporter=list
+        pnpm run test:e2e --reporter=list

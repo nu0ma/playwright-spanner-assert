@@ -13,7 +13,7 @@
     "preinstall": "npx only-allow pnpm",
     "build": "tsdown",
     "test:e2e": "playwright test",
-    "pretest:e2e": "npm run build",
+    "pretest:e2e": "pnpm run build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
