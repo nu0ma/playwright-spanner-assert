@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
-import { createSpalidateExecutionError } from './errors';
+import { SpalidateExecutionError } from './errors';
 import type {
   PlaceholderMap,
   ResolvedPlaywrightSpannerAssertConfig,
@@ -62,23 +62,12 @@ export async function runSpalidate({
 
     const timer = setTimeout(() => {
       child.kill('SIGKILL');
-      reject(
-        createSpalidateExecutionError('spalidate timed out', {
-          timeoutMs: DEFAULT_TIMEOUT_MS,
-          command,
-          args,
-        }),
-      );
+      reject(new SpalidateExecutionError(`spalidate timed out after ${DEFAULT_TIMEOUT_MS}ms`));
     }, DEFAULT_TIMEOUT_MS);
 
     child.on('error', (error) => {
       clearTimeout(timer);
-      reject(
-        createSpalidateExecutionError(`Failed to launch spalidate: ${error.message}`, {
-          command,
-          args,
-        }),
-      );
+      reject(new SpalidateExecutionError(`Failed to launch spalidate: ${error.message}`));
     });
 
     child.on('exit', (code, signal) => {
@@ -86,14 +75,10 @@ export async function runSpalidate({
       if (code === 0) {
         resolve();
       } else {
+        const signalInfo = signal ? ` (signal: ${signal})` : '';
         reject(
-          createSpalidateExecutionError(
-            `spalidate exited with non-zero code (${code ?? 'unknown'})`,
-            {
-              command,
-              args,
-              signal,
-            },
+          new SpalidateExecutionError(
+            `spalidate exited with non-zero code ${code ?? 'unknown'}${signalInfo}`,
           ),
         );
       }
@@ -103,7 +88,7 @@ export async function runSpalidate({
 
 function validateCommand(spalidate: SpalidateConfig | undefined): void {
   if (spalidate?.command && spalidate.command.trim() === '') {
-    throw createSpalidateExecutionError('spalidate command cannot be empty');
+    throw new SpalidateExecutionError('spalidate command cannot be empty');
   }
 }
 

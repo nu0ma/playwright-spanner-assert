@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import YAML from 'yaml';
 import { z } from 'zod';
-import { createConfigurationNotFoundError, createParsingError } from './errors';
+import { ConfigurationNotFoundError, ParsingError } from './errors';
 import type {
   DatabaseConfig,
   PlaywrightSpannerAssertOptions,
@@ -46,7 +46,7 @@ async function resolveConfigPath(explicitPath?: string): Promise<string> {
       await fs.access(explicitPath);
       return explicitPath;
     } catch {
-      throw createConfigurationNotFoundError(explicitPath);
+      throw new ConfigurationNotFoundError(explicitPath);
     }
   }
 
@@ -66,7 +66,7 @@ async function resolveConfigPath(explicitPath?: string): Promise<string> {
     }
   }
 
-  throw createConfigurationNotFoundError('playwright-spanner-assert.yaml');
+  throw new ConfigurationNotFoundError('playwright-spanner-assert.yaml');
 }
 
 async function parseConfig(
@@ -77,22 +77,17 @@ async function parseConfig(
   try {
     parsedYaml = YAML.parse(raw, { prettyErrors: true });
   } catch (error) {
-    throw createParsingError(
+    throw new ParsingError(
       `Failed to parse playwright-spanner-assert.yaml: ${(error as Error).message}`,
-      { configPath },
     );
   }
 
   const parsed = configSchema.safeParse(parsedYaml);
   if (!parsed.success) {
-    const issues = parsed.error.issues.map((issue) => ({
-      path: issue.path.join('.'),
-      message: issue.message,
-    }));
-    throw createParsingError('playwright-spanner-assert.yaml validation failed', {
-      configPath,
-      issues,
-    });
+    const issues = parsed.error.issues
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
+      .join('\n');
+    throw new ParsingError(`playwright-spanner-assert.yaml validation failed:\n${issues}`);
   }
 
   const config = parsed.data;

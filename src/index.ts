@@ -6,12 +6,10 @@ export default defaultClient;
 export { createClient as createPlaywrightSpannerAssert } from './client';
 
 export {
-  createConfigurationNotFoundError,
-  createError,
-  createExpectedDataNotFoundError,
-  createMissingFieldError,
-  createParsingError,
-  createSpalidateExecutionError,
+  ConfigurationNotFoundError,
+  ParsingError,
+  ExpectedDataNotFoundError,
+  SpalidateExecutionError,
 } from './errors';
 
 export type {

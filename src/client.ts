@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { loadConfig } from './config-loader';
-import { createExpectedDataNotFoundError } from './errors';
+import { ExpectedDataNotFoundError } from './errors';
 import type {
   PlaywrightSpannerAssertClient,
   PlaywrightSpannerAssertOptions,
@@ -40,7 +40,7 @@ async function resolveExpectedFile(
   const fileName = trimmed || config.expectedData;
 
   if (!fileName) {
-    throw createExpectedDataNotFoundError('default expected data is not set');
+    throw new ExpectedDataNotFoundError('default expected data is not set');
   }
 
   for (const root of searchRoots) {
@@ -56,7 +56,7 @@ async function resolveExpectedFile(
     }
   }
 
-  throw createExpectedDataNotFoundError(fileName);
+  throw new ExpectedDataNotFoundError(fileName);
 }
 
 function isWithin(target: string, baseDir: string): boolean {
