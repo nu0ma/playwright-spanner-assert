@@ -44,7 +44,7 @@ tables:
 ### 1. Install
 
 ```bash
-npm install playwright-spanner-assert
+pnpm add playwright-spanner-assert
 go install github.com/nu0ma/spalidate@latest
 ```
 
@@ -98,7 +98,7 @@ Done! That's all you need 🎉
 ### 1. Install Node.js package
 
 ```bash
-npm install playwright-spanner-assert
+pnpm add playwright-spanner-assert
 ```
 
 ### 2. Install spalidate CLI (Go binary)

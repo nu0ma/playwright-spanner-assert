@@ -26,17 +26,17 @@ tasks:
   build:
     desc: Build TypeScript output
     cmds:
-      - npm run build
+      - pnpm run build
 
   lint:
     desc: Run ESLint
     cmds:
-      - npm run lint
+      - pnpm run lint
 
   typecheck:
     desc: Run TypeScript type checker
     cmds:
-      - npm run typecheck
+      - pnpm run typecheck
 
   emulator:up:
     desc: Start Cloud Spanner emulator container
@@ -88,4 +88,4 @@ tasks:
         task emulator:up
         trap 'task emulator:down >/dev/null 2>&1 || true' EXIT
         task emulator:setup
-        npm run test:e2e -- --reporter=list
+        pnpm run test:e2e -- --reporter=list
