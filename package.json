@@ -33,14 +33,6 @@
     "yaml": "^2.5.0",
     "zod": "^4.1.11"
   },
-  "peerDependencies": {
-    "spalidate": ">=1.0.0"
-  },
-  "peerDependenciesMeta": {
-    "spalidate": {
-      "optional": true
-    }
-  },
   "devDependencies": {
     "@google-cloud/spanner": "^8.2.1",
     "@playwright/test": "^1.46.0",
