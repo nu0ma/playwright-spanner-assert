@@ -41,16 +41,36 @@ export function createConfigLoader(options: PlaywrightSpannerAssertOptions = {})
   let currentOptions = { ...options };
 
   const resolveConfigPath = async (): Promise<string> => {
-    const candidate =
-      currentOptions.configPath ||
-      process.env.PLAYWRIGHT_SPANNER_ASSERT_CONFIG ||
-      path.join(process.cwd(), 'playwright-spanner-assert.yaml');
-    try {
-      await fs.access(candidate);
-      return candidate;
-    } catch {
-      throw createConfigurationNotFoundError(candidate);
+    // 明示的な指定がある場合
+    if (currentOptions.configPath) {
+      const candidate = currentOptions.configPath;
+      try {
+        await fs.access(candidate);
+        return candidate;
+      } catch {
+        throw createConfigurationNotFoundError(candidate);
+      }
     }
+
+    // カレントディレクトリから親ディレクトリを順に上っていって探す
+    let currentDir = process.cwd();
+    const root = path.parse(currentDir).root;
+
+    while (true) {
+      const candidate = path.join(currentDir, 'playwright-spanner-assert.yaml');
+      try {
+        await fs.access(candidate);
+        return candidate;
+      } catch {
+        // 見つからない場合、親ディレクトリへ
+        if (currentDir === root) {
+          break;
+        }
+        currentDir = path.dirname(currentDir);
+      }
+    }
+
+    throw createConfigurationNotFoundError('playwright-spanner-assert.yaml');
   };
 
   const parseConfig = async (

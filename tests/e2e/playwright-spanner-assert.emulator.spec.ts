@@ -2,10 +2,18 @@ import { test } from '@playwright/test';
 import { execSync } from 'child_process';
 import path from 'path';
 
-const REQUIRED_ENV_VARS = ['SPANNER_EMULATOR_HOST', 'SPANNER_PROJECT', 'SPANNER_INSTANCE', 'SPANNER_DATABASE'];
+const REQUIRED_ENV_VARS = [
+  'SPANNER_EMULATOR_HOST',
+  'SPANNER_PROJECT',
+  'SPANNER_INSTANCE',
+  'SPANNER_DATABASE',
+];
 const missingEnv = REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
 
-test.skip(missingEnv.length > 0, `Spanner emulator tests require env vars: ${missingEnv.join(', ')}`);
+test.skip(
+  missingEnv.length > 0,
+  `Spanner emulator tests require env vars: ${missingEnv.join(', ')}`,
+);
 
 test.describe.configure({ mode: 'serial' });
 
@@ -44,19 +52,17 @@ function resetSamples(id: string, name: string): void {
 }
 
 test.beforeEach(async () => {
-  process.env.PLAYWRIGHT_SPANNER_ASSERT_CONFIG = configPath;
   delete require.cache[require.resolve('../../dist')];
 });
 
 test.afterEach(() => {
-  delete process.env.PLAYWRIGHT_SPANNER_ASSERT_CONFIG;
   delete require.cache[require.resolve('../../dist')];
 });
 
 function loadClient() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const loaded = require('../../dist');
-  return loaded.default ?? loaded;
+  const { createPlaywrightSpannerAssert } = require('../../dist');
+  return createPlaywrightSpannerAssert({ configPath });
 }
 
 test('validates default dataset against emulator', async () => {

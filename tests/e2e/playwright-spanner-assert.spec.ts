@@ -15,17 +15,14 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(() => {
-  delete process.env.PLAYWRIGHT_SPANNER_ASSERT_CONFIG;
   delete require.cache[require.resolve('../../dist')];
 });
 
 test('default export validates custom and default expectations', async () => {
-  process.env.PLAYWRIGHT_SPANNER_ASSERT_CONFIG = path.join(
-    fixturesDir,
-    'playwright-spanner-assert.yaml',
-  );
-  const module = require('../../dist');
-  const client = module.default ?? module;
+  const { createPlaywrightSpannerAssert } = require('../../dist');
+  const client = createPlaywrightSpannerAssert({
+    configPath: path.join(fixturesDir, 'playwright-spanner-assert.yaml'),
+  });
 
   await client.validateDatabaseState('expected/custom.yaml');
   await client.validateDatabaseState('');
