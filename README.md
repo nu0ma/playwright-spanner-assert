@@ -26,9 +26,8 @@ database:
   instanceId: staging
   database: sample
 spalidate:
-  command: npx
+  command: spalidate
   args:
-    - spalidate
     - validate
     - --schema
     - "{schemaFile}"

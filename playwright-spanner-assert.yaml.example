@@ -5,9 +5,8 @@ database:
   instanceId: your-instance-id
   database: your-database-name
 spalidate:
-  command: npx
+  command: spalidate
   args:
-    - spalidate
     - validate
     - --schema
     - "{schemaFile}"

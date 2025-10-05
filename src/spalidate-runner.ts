@@ -7,9 +7,8 @@ import type {
   SpalidateConfig,
 } from './types';
 
-const DEFAULT_COMMAND = 'npx';
+const DEFAULT_COMMAND = 'spalidate';
 const DEFAULT_ARGS = [
-  'spalidate',
   'validate',
   '--schema',
   '{schemaFile}',
