@@ -31,6 +31,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 10.17.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
       - name: Get package info
         id: package
         run: |
@@ -58,31 +70,6 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Setup pnpm
-        if: steps.tag-check.outputs.exists == 'false'
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-        with:
-          version: 10.17.0
-
-      - name: Setup Node.js
-        if: steps.tag-check.outputs.exists == 'false'
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
-        with:
-          node-version: 22
-          registry-url: 'https://registry.npmjs.org'
-          cache: 'pnpm'
-
-      - name: Ensure npm 11.5.1 or later is installed
-        if: steps.tag-check.outputs.exists == 'false'
-        run: |
-          NPM_VERSION=$(npm -v)
-          echo "Current npm version: $NPM_VERSION"
-          if ! npx semver -r ">=11.5.1" "$NPM_VERSION"; then
-            echo "npm version $NPM_VERSION is too old. Installing latest npm..."
-            npm install -g npm@latest
-            echo "Updated npm version: $(npm -v)"
-          fi
-
       - name: Install dependencies
         if: steps.tag-check.outputs.exists == 'false'
         run: pnpm install --frozen-lockfile
@@ -102,7 +89,9 @@ jobs:
 
       - name: Publish to npm with provenance
         if: steps.tag-check.outputs.exists == 'false'
-        run: npm publish --provenance --access public
+        run: pnpm publish --provenance --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release with tag
         id: create-release
