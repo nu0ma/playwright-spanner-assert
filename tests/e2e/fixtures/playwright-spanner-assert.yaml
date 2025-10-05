@@ -1,4 +1,3 @@
-schemaFile: ./schema/schema.sql
 expectedData: ./expected/default.yaml
 database:
   projectId: e2e-project
