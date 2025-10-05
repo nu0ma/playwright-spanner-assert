@@ -8,6 +8,7 @@ A simple utility for validating Cloud Spanner data from Playwright tests.
 
 ```bash
 npm install playwright-spanner-assert
+go install github.com/nu0ma/spalidate@latest
 ```
 
 ### 2. Create config file
@@ -57,11 +58,21 @@ Done! That's all you need 🎉
 
 ## Installation
 
+### 1. Install Node.js package
+
 ```bash
 npm install playwright-spanner-assert
 ```
 
-[spalidate](https://www.npmjs.com/package/spalidate) is a Cloud Spanner data validation tool and is required as a peer dependency.
+### 2. Install spalidate CLI (Go binary)
+
+[spalidate](https://github.com/nu0ma/spalidate) is a Cloud Spanner data validation tool written in Go and is required to run validations.
+
+```bash
+go install github.com/nu0ma/spalidate@latest
+```
+
+Make sure `spalidate` is in your PATH.
 
 ## Configuration
 
