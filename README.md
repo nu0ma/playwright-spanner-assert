@@ -61,9 +61,9 @@ test.describe('example-01-basic-setup', () => {
 設定ファイルの場所を変更したい場合は環境変数 `PLAYWRIGHT_SPANNER_ASSERT_CONFIG` か `PlaywrightSpannerAssert` クラスを直接利用してください。
 
 ```ts
-import { PlaywrightSpannerAssert } from 'playwright-spanner-assert';
+import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';
 
-const client = new PlaywrightSpannerAssert({ configPath: './configs/playwright-spanner-assert.yaml' });
+const client = createPlaywrightSpannerAssert({ configPath: './configs/playwright-spanner-assert.yaml' });
 await client.validateDatabaseState('expected-data.yaml');
 ```
 

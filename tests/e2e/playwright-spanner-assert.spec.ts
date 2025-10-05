@@ -39,9 +39,9 @@ test('default export validates custom and default expectations', async () => {
   expect(secondArgs).toContain(path.resolve(fixturesDir, 'expected/default.yaml'));
 });
 
-test('class instance uses explicit config path', async () => {
-  const { PlaywrightSpannerAssert } = require('../../dist');
-  const client = new PlaywrightSpannerAssert({
+test('factory produces isolated client with explicit config path', async () => {
+  const { createPlaywrightSpannerAssert } = require('../../dist');
+  const client = createPlaywrightSpannerAssert({
     configPath: path.join(fixturesDir, 'playwright-spanner-assert.yaml'),
   });
 
