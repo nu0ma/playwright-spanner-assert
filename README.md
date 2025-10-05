@@ -7,7 +7,7 @@ A simple utility for validating Cloud Spanner data from Playwright tests.
 ### 1. Install
 
 ```bash
-npm install playwright-spanner-assert spalidate
+npm install playwright-spanner-assert
 ```
 
 ### 2. Create config file
@@ -58,7 +58,7 @@ Done! That's all you need 🎉
 ## Installation
 
 ```bash
-npm install playwright-spanner-assert spalidate
+npm install playwright-spanner-assert
 ```
 
 [spalidate](https://www.npmjs.com/package/spalidate) is a Cloud Spanner data validation tool and is required as a peer dependency.
@@ -77,20 +77,6 @@ database:
 ```
 
 That's all you need.
-
-### Optional settings
-
-```yaml
-database:
-  projectId: my-project
-  instanceId: my-instance
-  database: my-database
-
-# Default expected data file (optional)
-expectedData: ./expected/initial-data.yaml
-```
-
-With `expectedData` set, you can omit the argument in `validateDatabaseState('')`.
 
 ## Usage
 
@@ -119,7 +105,7 @@ await client.validateDatabaseState('expected/data.yaml');
 
 ### Expected data file format
 
-Follow the [spalidate](https://www.npmjs.com/package/spalidate) format:
+Follow the [spalidate](https://github.com/nu0ma/spalidate) format:
 
 ```yaml
 tables:
@@ -135,22 +121,6 @@ tables:
     columns:
       UserId: '1'
 ```
-
-## Advanced
-
-### Enable debug logging
-
-```ts
-const client = createPlaywrightSpannerAssert({
-  onDebug: (event, payload) => {
-    console.log('[debug]', event, payload);
-  },
-});
-```
-
-### Timeout
-
-spalidate execution times out after 60 seconds (not configurable).
 
 ## License
 
