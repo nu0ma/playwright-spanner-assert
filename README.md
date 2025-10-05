@@ -1,6 +1,59 @@
 # playwright-spanner-assert
 
-A lightweight utility for triggering Cloud Spanner data validation from Playwright tests. Define schema and database metadata in `playwright-spanner-assert.yaml`, manage expected datasets in YAML files, and delegate the heavy lifting to [spalidate](https://www.npmjs.com/package/spalidate).
+A simple utility for validating Cloud Spanner data from Playwright tests.
+
+## Quick Start
+
+### 1. Install
+
+```bash
+npm install playwright-spanner-assert spalidate
+```
+
+### 2. Create config file
+
+Create `playwright-spanner-assert.yaml` in your project root:
+
+```yaml
+database:
+  projectId: my-project
+  instanceId: my-instance
+  database: my-database
+```
+
+### 3. Create expected data file
+
+Create `expected/users.yaml`:
+
+```yaml
+tables:
+  Users:
+    count: 2
+    columns:
+      Id: '1'
+      Name: 'Alice'
+```
+
+### 4. Use in tests
+
+```ts
+import { test } from '@playwright/test';
+import playwrightSpannerAssert from 'playwright-spanner-assert';
+
+test('user is created correctly', async ({ page }) => {
+  // Interact with your app
+  await page.goto('/signup');
+  await page.fill('input[name="name"]', 'Alice');
+  await page.click('button[type="submit"]');
+
+  // Validate database state
+  await playwrightSpannerAssert.validateDatabaseState('expected/users.yaml');
+});
+```
+
+Done! That's all you need 🎉
+
+---
 
 ## Installation
 
@@ -8,103 +61,96 @@ A lightweight utility for triggering Cloud Spanner data validation from Playwrig
 npm install playwright-spanner-assert spalidate
 ```
 
-If you use TypeScript, add the typings as dev dependencies:
-
-```bash
-npm install -D typescript @types/node
-```
+[spalidate](https://www.npmjs.com/package/spalidate) is a Cloud Spanner data validation tool and is required as a peer dependency.
 
 ## Configuration
 
-Place `playwright-spanner-assert.yaml` in the project root. The minimal configuration only requires the database connection info:
+### Minimal config
+
+Place `playwright-spanner-assert.yaml` in your project root:
 
 ```yaml
 database:
   projectId: my-project
-  instanceId: staging
-  database: sample
+  instanceId: my-instance
+  database: my-database
 ```
 
-Optional settings:
+That's all you need.
+
+### Optional settings
 
 ```yaml
 database:
   projectId: my-project
-  instanceId: staging
-  database: sample
+  instanceId: my-instance
+  database: my-database
 
-# デフォルトの期待データファイル（省略時は毎回引数で指定）
+# Default expected data file (optional)
 expectedData: ./expected/initial-data.yaml
-
-# カスタムコマンド引数用のプレースホルダー
-schemaFile: ./schema/spanner-schema.yaml
-
-# spalidate コマンドのカスタマイズ
-spalidate:
-  command: spalidate
-  args:
-    - --project
-    - '{projectId}'
-    - --instance
-    - '{instanceId}'
-    - --database
-    - '{databaseName}'
-    - '{expectedFile}'
 ```
 
-Placeholders such as `{schemaFile}` and `{expectedFile}` are expanded before invoking `spalidate`. If you omit `args`, the default arguments shown above are used. With `expectedData` set, `validateDatabaseState('')` falls back to the configured file when the argument is blank.
-
-Expected data files should follow the configuration format that the Go 製 `spalidate` CLI consumes, for example:
-
-```yaml
-tables:
-  Samples:
-    count: 1
-    columns:
-      Id: '1'
-      Name: 'Default Name'
-```
+With `expectedData` set, you can omit the argument in `validateDatabaseState('')`.
 
 ## Usage
 
+### Basic usage
+
 ```ts
-import playwrightSpannerAssert from 'playwright-spanner-assert';
 import { test } from '@playwright/test';
+import playwrightSpannerAssert from 'playwright-spanner-assert';
 
-test.describe('example-01-basic-setup', () => {
-  test('Database Validation', async () => {
-    await playwrightSpannerAssert.validateDatabaseState('expected-data.yaml');
-  });
+test('database validation', async () => {
+  await playwrightSpannerAssert.validateDatabaseState('expected/data.yaml');
 });
 ```
 
-To load a configuration file from a custom location, provide the factory with a `configPath`.
+### Using a custom config file
 
 ```ts
 import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';
 
 const client = createPlaywrightSpannerAssert({
-  configPath: './configs/playwright-spanner-assert.yaml',
+  configPath: './config/spanner-test.yaml',
 });
-await client.validateDatabaseState('expected-data.yaml');
+
+await client.validateDatabaseState('expected/data.yaml');
 ```
 
-## Advanced options
+### Expected data file format
 
-`createPlaywrightSpannerAssert` に渡せる追加オプションは `onDebug` のみです。`spalidate` の実行は常に 60,000 ms でタイムアウトし、この値を変更するための設定は提供していません。
+Follow the [spalidate](https://www.npmjs.com/package/spalidate) format:
+
+```yaml
+tables:
+  Users:
+    count: 1
+    columns:
+      Id: '1'
+      Name: 'Alice'
+      Email: 'alice@example.com'
+
+  Posts:
+    count: 3
+    columns:
+      UserId: '1'
+```
+
+## Advanced
+
+### Enable debug logging
 
 ```ts
-import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';
-
 const client = createPlaywrightSpannerAssert({
-  configPath: './configs/playwright-spanner-assert.yaml',
   onDebug: (event, payload) => {
-    console.debug('[span-assert]', event, payload);
+    console.log('[debug]', event, payload);
   },
 });
-
-await client.validateDatabaseState('expected-data.yaml');
 ```
+
+### Timeout
+
+spalidate execution times out after 60 seconds (not configurable).
 
 ## License
 

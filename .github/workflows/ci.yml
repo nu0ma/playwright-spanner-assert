@@ -26,11 +26,6 @@ jobs:
       - name: Install Task
         uses: go-task/setup-task@v1
 
-      - name: Setup gcloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          install_components: true
-
       - name: Lint
         run: npm run lint
 
