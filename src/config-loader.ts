@@ -8,7 +8,6 @@ import {
 } from './errors';
 import type {
   DatabaseConfig,
-  PlaywrightSpannerAssertConfig,
   PlaywrightSpannerAssertOptions,
   ResolvedPlaywrightSpannerAssertConfig,
   SpalidateConfig,
@@ -20,9 +19,7 @@ export type ConfigLoader = {
   load: (force?: boolean) => Promise<ResolvedPlaywrightSpannerAssertConfig>;
 };
 
-export function createConfigLoader(
-  options: PlaywrightSpannerAssertOptions = {}
-): ConfigLoader {
+export function createConfigLoader(options: PlaywrightSpannerAssertOptions = {}): ConfigLoader {
   let currentOptions = { ...options };
   let cachedConfig: ResolvedPlaywrightSpannerAssertConfig | null = null;
   let cachedPath: string | null = null;
@@ -43,7 +40,7 @@ export function createConfigLoader(
 
   const parseConfig = async (
     raw: string,
-    configPath: string
+    configPath: string,
   ): Promise<ResolvedPlaywrightSpannerAssertConfig> => {
     let parsedYaml: unknown;
     try {
@@ -51,7 +48,7 @@ export function createConfigLoader(
     } catch (error) {
       throw createParsingError(
         `Failed to parse playwright-spanner-assert.yaml: ${(error as Error).message}`,
-        { configPath }
+        { configPath },
       );
     }
 
@@ -88,10 +85,7 @@ export function createConfigLoader(
     const configPath = await resolveConfigPath();
     const stat = await fs.stat(configPath);
     const needsReload =
-      force ||
-      !cachedConfig ||
-      cachedPath !== configPath ||
-      cachedMtimeMs !== stat.mtimeMs;
+      force || !cachedConfig || cachedPath !== configPath || cachedMtimeMs !== stat.mtimeMs;
 
     if (!needsReload && cachedConfig) {
       return cachedConfig;
@@ -119,7 +113,7 @@ export function createConfigLoader(
 
 function resolveSpalidate(
   cfg: SpalidateConfig | undefined,
-  configDir: string
+  configDir: string,
 ): SpalidateConfig | undefined {
   if (!cfg) {
     return undefined;

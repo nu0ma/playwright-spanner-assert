@@ -22,7 +22,7 @@ test.afterEach(() => {
 test('default export validates custom and default expectations', async () => {
   process.env.PLAYWRIGHT_SPANNER_ASSERT_CONFIG = path.join(
     fixturesDir,
-    'playwright-spanner-assert.yaml'
+    'playwright-spanner-assert.yaml',
   );
   const module = require('../../dist');
   const client = module.default ?? module;

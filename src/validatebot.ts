@@ -9,7 +9,9 @@ export type ValidationResult<T> =
   | { success: true; data: T }
   | { success: false; issues: ValidationIssue[] };
 
-export function validateConfigSchema(input: unknown): ValidationResult<PlaywrightSpannerAssertConfig> {
+export function validateConfigSchema(
+  input: unknown,
+): ValidationResult<PlaywrightSpannerAssertConfig> {
   const issues: ValidationIssue[] = [];
 
   if (!isPlainObject(input)) {
@@ -26,7 +28,12 @@ export function validateConfigSchema(input: unknown): ValidationResult<Playwrigh
 
   const obj = input as Record<string, unknown>;
   const schemaFile = readString(obj.schemaFile, 'schemaFile', issues, true);
-  const defaultExpectedData = readString(obj.defaultExpectedData, 'defaultExpectedData', issues, false);
+  const defaultExpectedData = readString(
+    obj.defaultExpectedData,
+    'defaultExpectedData',
+    issues,
+    false,
+  );
   const database = validateDatabase(obj.database, issues);
   const spalidate = validateSpalidate(obj.spalidate, issues);
 
@@ -80,7 +87,10 @@ function validateSpalidate(value: unknown, issues: ValidationIssue[]): Spalidate
     if (Array.isArray(obj.args) && obj.args.every((item) => typeof item === 'string')) {
       result.args = obj.args as string[];
     } else {
-      issues.push({ path: 'spalidate.args', message: 'spalidate.args must be an array of strings' });
+      issues.push({
+        path: 'spalidate.args',
+        message: 'spalidate.args must be an array of strings',
+      });
     }
   }
 
@@ -88,7 +98,10 @@ function validateSpalidate(value: unknown, issues: ValidationIssue[]): Spalidate
     if (isRecordOfStrings(obj.env)) {
       result.env = obj.env as Record<string, string>;
     } else {
-      issues.push({ path: 'spalidate.env', message: 'spalidate.env must be a record of string values' });
+      issues.push({
+        path: 'spalidate.env',
+        message: 'spalidate.env must be a record of string values',
+      });
     }
   }
 
@@ -96,7 +109,10 @@ function validateSpalidate(value: unknown, issues: ValidationIssue[]): Spalidate
     if (isPlainObject(obj.spawnOptions)) {
       result.spawnOptions = obj.spawnOptions as SpalidateConfig['spawnOptions'];
     } else {
-      issues.push({ path: 'spalidate.spawnOptions', message: 'spalidate.spawnOptions must be an object' });
+      issues.push({
+        path: 'spalidate.spawnOptions',
+        message: 'spalidate.spawnOptions must be an object',
+      });
     }
   }
 
@@ -104,7 +120,7 @@ function validateSpalidate(value: unknown, issues: ValidationIssue[]): Spalidate
     obj.workingDirectory,
     'spalidate.workingDirectory',
     issues,
-    false
+    false,
   );
   if (workingDirectory) {
     result.workingDirectory = workingDirectory;
@@ -117,7 +133,7 @@ function readString(
   value: unknown,
   path: string,
   issues: ValidationIssue[],
-  required: boolean
+  required: boolean,
 ): string | undefined {
   if (value === undefined || value === null) {
     if (required) {

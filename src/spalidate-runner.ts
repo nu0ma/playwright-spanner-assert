@@ -1,7 +1,11 @@
 import { spawn } from 'child_process';
 import path from 'path';
 import { createSpalidateExecutionError } from './errors';
-import type { PlaceholderMap, ResolvedPlaywrightSpannerAssertConfig, SpalidateConfig } from './types';
+import type {
+  PlaceholderMap,
+  ResolvedPlaywrightSpannerAssertConfig,
+  SpalidateConfig,
+} from './types';
 
 const DEFAULT_COMMAND = 'npx';
 const DEFAULT_ARGS = [
@@ -69,7 +73,7 @@ export async function runSpalidate({
               timeoutMs,
               command,
               args,
-            })
+            }),
           );
         }, timeoutMs)
       : null;
@@ -82,7 +86,7 @@ export async function runSpalidate({
         createSpalidateExecutionError(`Failed to launch spalidate: ${error.message}`, {
           command,
           args,
-        })
+        }),
       );
     });
 
@@ -100,8 +104,8 @@ export async function runSpalidate({
               command,
               args,
               signal,
-            }
-          )
+            },
+          ),
         );
       }
     });
@@ -116,7 +120,7 @@ function validateCommand(spalidate: SpalidateConfig | undefined): void {
 
 function buildPlaceholderMap(
   config: ResolvedPlaywrightSpannerAssertConfig,
-  expectedFile: string
+  expectedFile: string,
 ): PlaceholderMap {
   return {
     schemaFile: config.schemaFile,
@@ -137,7 +141,7 @@ function replacePlaceholders(template: string, placeholders: PlaceholderMap): st
 }
 
 function sanitizeSpawnOptions(
-  options: SpalidateConfig['spawnOptions']
+  options: SpalidateConfig['spawnOptions'],
 ): SpalidateConfig['spawnOptions'] | undefined {
   if (!options) {
     return undefined;

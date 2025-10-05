@@ -12,7 +12,9 @@
     "build": "tsdown",
     "test:e2e": "playwright test",
     "pretest:e2e": "npm run build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "format": "prettier --write \"{src,tests}/**/*.{ts,tsx,js,json}\""
   },
   "keywords": [
     "playwright",
@@ -39,7 +41,20 @@
   "devDependencies": {
     "@playwright/test": "^1.46.0",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.2.0",
+    "prettier": "^3.6.2",
     "tsdown": "^0.15.6",
     "typescript": "^5.5.0"
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 100
   }
 }

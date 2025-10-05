@@ -1,8 +1,6 @@
 import path from 'path';
 import { createConfigLoader } from './config-loader';
-import {
-  createExpectedDataNotFoundError,
-} from './errors';
+import { createExpectedDataNotFoundError } from './errors';
 import { ensureWithinBase } from './path-utils';
 import type {
   ConfigLoader,
@@ -20,12 +18,7 @@ export type CreateClientOptions = PlaywrightSpannerAssertOptions & {
 };
 
 export function createClient(options: CreateClientOptions = {}): PlaywrightSpannerAssertClient {
-  const {
-    configLoader: providedLoader,
-    timeoutMs,
-    onDebug,
-    ...loaderOptions
-  } = options;
+  const { configLoader: providedLoader, timeoutMs, onDebug, ...loaderOptions } = options;
   const configLoader = providedLoader ?? createConfigLoader(loaderOptions);
 
   const setConfigPath = (configPath: string): void => {
@@ -61,7 +54,7 @@ export function createClient(options: CreateClientOptions = {}): PlaywrightSpann
 
 async function resolveExpectedFile(
   rawPath: string | undefined,
-  config: ResolvedPlaywrightSpannerAssertConfig
+  config: ResolvedPlaywrightSpannerAssertConfig,
 ): Promise<string> {
   const trimmed = rawPath?.trim() ?? '';
   const candidates: string[] = [];
@@ -88,7 +81,7 @@ async function resolveExpectedFile(
     }
   }
 
-  const messagePath = trimmed.length > 0 ? trimmed : config.defaultExpectedData ?? 'unknown';
+  const messagePath = trimmed.length > 0 ? trimmed : (config.defaultExpectedData ?? 'unknown');
   throw createExpectedDataNotFoundError(messagePath);
 }
 
