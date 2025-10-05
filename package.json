@@ -4,6 +4,7 @@
   "description": "Helper for asserting Cloud Spanner data from Playwright tests",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "packageManager": "pnpm@10.17.0",
   "files": [
     "dist",
     "playwright-spanner-assert.yaml.example"
