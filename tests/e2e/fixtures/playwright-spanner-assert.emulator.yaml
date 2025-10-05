@@ -5,9 +5,8 @@ database:
   instanceId: e2e-instance
   database: e2e-database
 spalidate:
-  command: node
+  command: spalidate
   args:
-    - ../mock-spalidate.js
     - --project
     - "{projectId}"
     - --instance
@@ -15,4 +14,3 @@ spalidate:
     - --database
     - "{databaseName}"
     - "{expectedFile}"
-  workingDirectory: ./

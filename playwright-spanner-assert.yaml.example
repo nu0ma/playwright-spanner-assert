@@ -7,14 +7,10 @@ database:
 spalidate:
   command: spalidate
   args:
-    - validate
-    - --schema
-    - "{schemaFile}"
     - --project
     - "{projectId}"
     - --instance
     - "{instanceId}"
     - --database
     - "{databaseName}"
-    - --expected
     - "{expectedFile}"

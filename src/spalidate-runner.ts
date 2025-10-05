@@ -9,16 +9,12 @@ import type {
 
 const DEFAULT_COMMAND = 'spalidate';
 const DEFAULT_ARGS = [
-  'validate',
-  '--schema',
-  '{schemaFile}',
   '--project',
   '{projectId}',
   '--instance',
   '{instanceId}',
   '--database',
   '{databaseName}',
-  '--expected',
   '{expectedFile}',
 ];
 

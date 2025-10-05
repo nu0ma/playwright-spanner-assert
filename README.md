@@ -28,20 +28,27 @@ database:
 spalidate:
   command: spalidate
   args:
-    - validate
-    - --schema
-    - "{schemaFile}"
     - --project
     - "{projectId}"
     - --instance
     - "{instanceId}"
     - --database
     - "{databaseName}"
-    - --expected
     - "{expectedFile}"
 ```
 
 Placeholders such as `{schemaFile}` and `{expectedFile}` are expanded before invoking `spalidate`. If you omit `args`, the default sequence shown above is used. With `defaultExpectedData` set, `validateDatabaseState('')` falls back to the configured file when the argument is blank.
+
+Expected data files should follow the configuration format that the Go 製 `spalidate` CLI consumes, for example:
+
+```yaml
+tables:
+  Samples:
+    count: 1
+    columns:
+      Id: "1"
+      Name: "Default Name"
+```
 
 ## Usage
 
