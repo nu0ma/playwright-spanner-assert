@@ -1,5 +1,5 @@
 schemaFile: ./schema/spanner-schema.yaml
-defaultExpectedData: ./expected/initial-data.yaml
+expectedData: ./expected/initial-data.yaml
 database:
   projectId: your-project-id
   instanceId: your-instance-id

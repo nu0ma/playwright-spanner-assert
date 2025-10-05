@@ -27,107 +27,88 @@ const spalidateSchema = z
 
 const configSchema = z.object({
   schemaFile: z.string().min(1),
-  defaultExpectedData: z.string().min(1).optional(),
+  expectedData: z.string().min(1).optional(),
   database: databaseSchema,
   spalidate: spalidateSchema,
 });
 
-export type ConfigLoader = {
-  setConfigPath: (configPath: string | undefined) => void;
-  load: () => Promise<ResolvedPlaywrightSpannerAssertConfig>;
-};
+export async function loadConfig(
+  options: PlaywrightSpannerAssertOptions = {},
+): Promise<ResolvedPlaywrightSpannerAssertConfig> {
+  const configPath = await resolveConfigPath(options.configPath);
+  const raw = await fs.readFile(configPath, 'utf8');
+  return parseConfig(raw, configPath);
+}
 
-export function createConfigLoader(options: PlaywrightSpannerAssertOptions = {}): ConfigLoader {
-  let currentOptions = { ...options };
-
-  const resolveConfigPath = async (): Promise<string> => {
-    // 明示的な指定がある場合
-    if (currentOptions.configPath) {
-      const candidate = currentOptions.configPath;
-      try {
-        await fs.access(candidate);
-        return candidate;
-      } catch {
-        throw createConfigurationNotFoundError(candidate);
-      }
-    }
-
-    // カレントディレクトリから親ディレクトリを順に上っていって探す
-    let currentDir = process.cwd();
-    const root = path.parse(currentDir).root;
-
-    while (true) {
-      const candidate = path.join(currentDir, 'playwright-spanner-assert.yaml');
-      try {
-        await fs.access(candidate);
-        return candidate;
-      } catch {
-        // 見つからない場合、親ディレクトリへ
-        if (currentDir === root) {
-          break;
-        }
-        currentDir = path.dirname(currentDir);
-      }
-    }
-
-    throw createConfigurationNotFoundError('playwright-spanner-assert.yaml');
-  };
-
-  const parseConfig = async (
-    raw: string,
-    configPath: string,
-  ): Promise<ResolvedPlaywrightSpannerAssertConfig> => {
-    let parsedYaml: unknown;
+async function resolveConfigPath(explicitPath?: string): Promise<string> {
+  if (explicitPath) {
     try {
-      parsedYaml = YAML.parse(raw, { prettyErrors: true });
-    } catch (error) {
-      throw createParsingError(
-        `Failed to parse playwright-spanner-assert.yaml: ${(error as Error).message}`,
-        { configPath },
-      );
+      await fs.access(explicitPath);
+      return explicitPath;
+    } catch {
+      throw createConfigurationNotFoundError(explicitPath);
     }
+  }
 
-    const parsed = configSchema.safeParse(parsedYaml);
-    if (!parsed.success) {
-      const issues = parsed.error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: issue.message,
-      }));
-      throw createParsingError('playwright-spanner-assert.yaml validation failed', {
-        configPath,
-        issues,
-      });
+  let currentDir = process.cwd();
+  const root = path.parse(currentDir).root;
+
+  while (true) {
+    const candidatePath = path.join(currentDir, 'playwright-spanner-assert.yaml');
+    try {
+      await fs.access(candidatePath);
+      return candidatePath;
+    } catch {
+      if (currentDir === root) {
+        break;
+      }
+      currentDir = path.dirname(currentDir);
     }
+  }
 
-    const config = parsed.data;
+  throw createConfigurationNotFoundError('playwright-spanner-assert.yaml');
+}
 
-    const configDir = path.dirname(configPath);
-    const resolvePath = (value: string | undefined): string | undefined =>
-      value ? path.resolve(configDir, value) : undefined;
+async function parseConfig(
+  raw: string,
+  configPath: string,
+): Promise<ResolvedPlaywrightSpannerAssertConfig> {
+  let parsedYaml: unknown;
+  try {
+    parsedYaml = YAML.parse(raw, { prettyErrors: true });
+  } catch (error) {
+    throw createParsingError(
+      `Failed to parse playwright-spanner-assert.yaml: ${(error as Error).message}`,
+      { configPath },
+    );
+  }
 
-    return {
-      ...config,
-      schemaFile: resolvePath(config.schemaFile)!,
-      defaultExpectedData: resolvePath(config.defaultExpectedData),
-      database: { ...config.database } satisfies DatabaseConfig,
-      spalidate: resolveSpalidate(config.spalidate, configDir),
-      configDir,
-    } satisfies ResolvedPlaywrightSpannerAssertConfig;
-  };
+  const parsed = configSchema.safeParse(parsedYaml);
+  if (!parsed.success) {
+    const issues = parsed.error.issues.map((issue) => ({
+      path: issue.path.join('.'),
+      message: issue.message,
+    }));
+    throw createParsingError('playwright-spanner-assert.yaml validation failed', {
+      configPath,
+      issues,
+    });
+  }
 
-  const load = async (): Promise<ResolvedPlaywrightSpannerAssertConfig> => {
-    const configPath = await resolveConfigPath();
-    const raw = await fs.readFile(configPath, 'utf8');
-    return parseConfig(raw, configPath);
-  };
+  const config = parsed.data;
 
-  const setConfigPath = (configPath: string | undefined): void => {
-    if (configPath) {
-      currentOptions = { ...currentOptions, configPath };
-    }
-  };
+  const configDir = path.dirname(configPath);
+  const resolvePath = (value: string | undefined): string | undefined =>
+    value ? path.resolve(configDir, value) : undefined;
 
-  return { setConfigPath, load };
+  return {
+    ...config,
+    schemaFile: resolvePath(config.schemaFile)!,
+    expectedData: resolvePath(config.expectedData),
+    database: { ...config.database } satisfies DatabaseConfig,
+    spalidate: resolveSpalidate(config.spalidate, configDir),
+    configDir,
+  } satisfies ResolvedPlaywrightSpannerAssertConfig;
 }
 
 function resolveSpalidate(

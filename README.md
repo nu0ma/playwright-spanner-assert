@@ -20,7 +20,7 @@ Place `playwright-spanner-assert.yaml` in the project root. Use `playwright-span
 
 ```yaml
 schemaFile: ./schema/spanner-schema.yaml
-defaultExpectedData: ./expected/initial-data.yaml
+expectedData: ./expected/initial-data.yaml
 database:
   projectId: my-project
   instanceId: staging
@@ -37,7 +37,7 @@ spalidate:
     - '{expectedFile}'
 ```
 
-Placeholders such as `{schemaFile}` and `{expectedFile}` are expanded before invoking `spalidate`. If you omit `args`, the default sequence shown above is used. With `defaultExpectedData` set, `validateDatabaseState('')` falls back to the configured file when the argument is blank.
+Placeholders such as `{schemaFile}` and `{expectedFile}` are expanded before invoking `spalidate`. If you omit `args`, the default sequence shown above is used. With `expectedData` set, `validateDatabaseState('')` falls back to the configured file when the argument is blank.
 
 Expected data files should follow the configuration format that the Go 製 `spalidate` CLI consumes, for example:
 
@@ -63,7 +63,7 @@ test.describe('example-01-basic-setup', () => {
 });
 ```
 
-To load a configuration file from a custom location, provide the factory with a `configPath` or set the `PLAYWRIGHT_SPANNER_ASSERT_CONFIG` environment variable.
+To load a configuration file from a custom location, provide the factory with a `configPath`.
 
 ```ts
 import { createPlaywrightSpannerAssert } from 'playwright-spanner-assert';

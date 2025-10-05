@@ -16,14 +16,14 @@ export type SpalidateConfig = {
 
 export type PlaywrightSpannerAssertConfig = {
   schemaFile: string;
-  defaultExpectedData?: string;
+  expectedData?: string;
   database: DatabaseConfig;
   spalidate?: SpalidateConfig;
 };
 
 export type ResolvedPlaywrightSpannerAssertConfig = PlaywrightSpannerAssertConfig & {
   schemaFile: string;
-  defaultExpectedData?: string;
+  expectedData?: string;
   configDir: string;
 };
 
@@ -34,6 +34,5 @@ export type PlaywrightSpannerAssertOptions = {
 export type PlaceholderMap = Record<string, string>;
 
 export type PlaywrightSpannerAssertClient = {
-  setConfigPath: (configPath: string) => void;
   validateDatabaseState: (expectedDataPath?: string) => Promise<void>;
 };

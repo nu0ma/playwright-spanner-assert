@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { createConfigLoader } from './config-loader';
+import { loadConfig } from './config-loader';
 import { createExpectedDataNotFoundError } from './errors';
 import type {
   PlaywrightSpannerAssertClient,
@@ -15,14 +15,9 @@ export type CreateClientOptions = PlaywrightSpannerAssertOptions & {
 
 export function createClient(options: CreateClientOptions = {}): PlaywrightSpannerAssertClient {
   const { onDebug, configPath } = options;
-  const configLoader = createConfigLoader({ configPath });
-
-  const setConfigPath = (configPath: string): void => {
-    configLoader.setConfigPath(configPath);
-  };
 
   const validateDatabaseState = async (expectedDataPath?: string): Promise<void> => {
-    const config = await configLoader.load();
+    const config = await loadConfig({ configPath });
     const expectedFile = await resolveExpectedFile(expectedDataPath, config);
     await runSpalidate({
       config,
@@ -32,7 +27,6 @@ export function createClient(options: CreateClientOptions = {}): PlaywrightSpann
   };
 
   return {
-    setConfigPath,
     validateDatabaseState,
   };
 }
@@ -43,7 +37,7 @@ async function resolveExpectedFile(
 ): Promise<string> {
   const trimmed = rawPath?.trim() ?? '';
   const searchRoots = trimmed ? [config.configDir, process.cwd()] : [config.configDir];
-  const fileName = trimmed || config.defaultExpectedData;
+  const fileName = trimmed || config.expectedData;
 
   if (!fileName) {
     throw createExpectedDataNotFoundError('default expected data is not set');

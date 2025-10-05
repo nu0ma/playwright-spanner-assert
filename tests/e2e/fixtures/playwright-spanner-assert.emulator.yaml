@@ -1,5 +1,5 @@
 schemaFile: ./schema/schema.sql
-defaultExpectedData: ./expected/default.yaml
+expectedData: ./expected/default.yaml
 database:
   projectId: e2e-project
   instanceId: e2e-instance
@@ -8,9 +8,9 @@ spalidate:
   command: spalidate
   args:
     - --project
-    - "{projectId}"
+    - '{projectId}'
     - --instance
-    - "{instanceId}"
+    - '{instanceId}'
     - --database
-    - "{databaseName}"
-    - "{expectedFile}"
+    - '{databaseName}'
+    - '{expectedFile}'
