@@ -13,7 +13,7 @@ test('user is created correctly', async () => {
   // Your test code...
 
   // Validate Spanner state with expected data
-  await playwrightSpannerAssert.validateDatabaseState('expected/data.yaml');
+  await playwrightSpannerAssert.validateDatabaseState('expected/user.yaml');
 });
 ```
 
