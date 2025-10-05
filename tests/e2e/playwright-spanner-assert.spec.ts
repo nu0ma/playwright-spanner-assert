@@ -35,13 +35,15 @@ const spanner = new Spanner({ projectId: project });
 const spannerInstance = spanner.instance(instance);
 const database = spannerInstance.database(databaseName);
 
-async function runSql(sql: string): Promise<void> {
-  await database.run(sql);
-}
-
 async function resetSamples(id: string, name: string): Promise<void> {
-  await runSql('DELETE FROM Samples WHERE TRUE');
-  await runSql(`INSERT INTO Samples (Id, Name) VALUES ('${id}', '${name}')`);
+  await database.runTransactionAsync(async (transaction) => {
+    await transaction.runUpdate('DELETE FROM Samples WHERE TRUE');
+    await transaction.runUpdate({
+      sql: 'INSERT INTO Samples (Id, Name) VALUES (@id, @name)',
+      params: { id, name },
+    });
+    await transaction.commit();
+  });
 }
 
 test.beforeEach(async () => {
