@@ -1,12 +1,5 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import { loadConfig, resolveExpectedFile } from './config-loader';
-import { ExpectedDataNotFoundError } from './errors';
-import type {
-  PlaywrightSpannerAssertClient,
-  PlaywrightSpannerAssertOptions,
-  ResolvedPlaywrightSpannerAssertConfig,
-} from './types';
+import type { PlaywrightSpannerAssertClient, PlaywrightSpannerAssertOptions } from './types';
 import { runSpalidate } from './validation';
 
 export type CreateClientOptions = PlaywrightSpannerAssertOptions & {
